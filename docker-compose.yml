@@ -1,0 +1,55 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: medwaste_app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=MedWaste Watch
+      - APP_ENV=production
+      - APP_DEBUG=true
+      - APP_URL=http://localhost:8000
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=medwaste_db
+      - DB_USERNAME=root
+      - DB_PASSWORD=root_password
+      - AUTO_MIGRATE=true
+      - SESSION_LIFETIME=7200
+      - CSRF_SECRET=medwaste_watch_docker_secure_csrf_secret_2026
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - storage_data:/var/www/html/backend/storage
+
+  db:
+    image: mysql:8.0
+    container_name: medwaste_db
+    restart: unless-stopped
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: medwaste_db
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -proot_password --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  db_data:
+    name: medwaste_db_data
+  storage_data:
+    name: medwaste_storage_data

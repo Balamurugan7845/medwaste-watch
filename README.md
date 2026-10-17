@@ -106,8 +106,34 @@ graph TD
 ## 🚀 Quickstart Guide
 
 ### Prerequisites
-- **Windows OS** with **XAMPP** (or Apache + MySQL + PHP 8.2+).
-- MySQL service running on port `3306`.
+- **Option A (Docker - Recommended)**: [Docker Desktop](https://www.docker.com/) installed and running.
+- **Option B (Local Windows)**: **Windows OS** with **XAMPP** (or Apache + MySQL + PHP 8.2+).
+
+---
+
+### 🐳 Quickstart with Docker (1-Click Run)
+
+Start the entire stack (PHP 8.2 Application + MySQL 8.0 + Automated Migrations & Seeds) in seconds:
+
+```bash
+docker compose up --build -d
+```
+
+Open **[http://localhost:8000](http://localhost:8000)** in your browser!
+
+To stop containers:
+```bash
+docker compose down
+```
+
+To run clinical automated tests inside the container:
+```bash
+docker compose exec app php backend/tests/run-tests.php
+```
+
+---
+
+### 💻 Local Windows Setup (Without Docker)
 
 ### 1️⃣ Database Configuration & Migration
 Open [`backend/.env`](file:///C:/Users/Balamurugan/Desktop/MedWaste/backend/.env) and configure your local MySQL credentials:

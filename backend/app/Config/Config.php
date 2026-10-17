@@ -38,7 +38,11 @@ class Config
     public static function get(string $key, mixed $default = null): mixed
     {
         self::load();
-        return self::$env[$key] ?? getenv($key) ?: $default;
+        $env = getenv($key);
+        if ($env !== false && $env !== '') {
+            return $env;
+        }
+        return self::$env[$key] ?? $default;
     }
 
     public static function getInt(string $key, int $default = 0): int

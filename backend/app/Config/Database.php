@@ -26,6 +26,15 @@ class Database
             $username = (string) Config::get('DB_USERNAME', 'root');
             $password = (string) Config::get('DB_PASSWORD', '');
             $sslCa = (string) Config::get('DB_SSL_CA', '');
+            $appEnv = (string) Config::get('APP_ENV', 'development');
+
+            if ($appEnv === 'production' && $sslCa === '') {
+                throw new RuntimeException('DB_SSL_CA must be configured in production.');
+            }
+
+            if ($sslCa !== '' && (!is_file($sslCa) || !is_readable($sslCa))) {
+                throw new RuntimeException("TiDB CA certificate is missing or unreadable: {$sslCa}");
+            }
 
             $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";
 

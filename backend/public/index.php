@@ -82,6 +82,11 @@ CsrfMiddleware::verify($request);
 
 $router = new Router();
 
+// Lightweight deployment probe; confirms the Render service is reaching the API front controller.
+$router->get('/api', function() {
+    Response::success(['service' => 'MedWaste Watch API']);
+});
+
 // Middleware helper callbacks
 $auth = fn(Request $r) => AuthMiddleware::authenticate($r);
 

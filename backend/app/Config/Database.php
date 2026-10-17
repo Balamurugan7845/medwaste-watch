@@ -25,6 +25,7 @@ class Database
             $charset = (string) Config::get('DB_CHARSET', 'utf8mb4');
             $username = (string) Config::get('DB_USERNAME', 'root');
             $password = (string) Config::get('DB_PASSWORD', '');
+            $sslCa = (string) Config::get('DB_SSL_CA', '');
 
             $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset={$charset}";
 
@@ -34,6 +35,11 @@ class Database
                 PDO::ATTR_EMULATE_PREPARES   => false,
                 PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES {$charset} COLLATE utf8mb4_unicode_ci"
             ];
+
+            if ($sslCa !== '') {
+                $options[PDO::MYSQL_ATTR_SSL_CA] = $sslCa;
+                $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
+            }
 
             try {
                 self::$connection = new PDO($dsn, $username, $password, $options);

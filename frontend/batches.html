@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Consignments & Inventory — MedWaste Watch</title>
+    <link rel="stylesheet" href="/assets/css/variables.css">
+    <link rel="stylesheet" href="/assets/css/reset.css">
+    <link rel="stylesheet" href="/assets/css/typography.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/forms.css">
+    <link rel="stylesheet" href="/assets/css/tables.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <script src="/assets/js/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="app-main">
+            <div id="topbar-container"></div>
+
+            <main class="content-container">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+                            <span>Batch Management & Consignments</span>
+                        </h1>
+                        <p>Track incoming shipments, storage locations, unit costs, and physical batch adjustments.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="openReceiveBatchModal()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            <span>Register Inbound Batch</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filter-bar">
+                    <div class="search-input-wrapper">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <input type="text" id="search-input" class="search-input" placeholder="Search by batch number or medicine name...">
+                    </div>
+                    <div class="filter-controls">
+                        <select id="location-filter" class="form-select" style="min-width: 180px;">
+                            <option value="0">All Storage Locations</option>
+                        </select>
+                        <button class="btn btn-secondary btn-sm" onclick="resetFilters()">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="data-table-container">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Batch #</th>
+                                    <th>Medicine Name</th>
+                                    <th>Storage Location</th>
+                                    <th>Supplier</th>
+                                    <th>Expiry Date</th>
+                                    <th>Days Left</th>
+                                    <th>On-Hand</th>
+                                    <th>Reserved</th>
+                                    <th>Available</th>
+                                    <th>Unit Cost</th>
+                                    <th>Urgency</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batches-tbody">
+                                <tr><td colspan="12" class="text-center text-muted" style="padding:2rem;">Loading batch consignments...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal: Register Inbound Batch -->
+    <div class="modal-backdrop" id="receive-batch-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Register Inbound Batch Consignment</h3>
+                <button class="modal-close-btn" onclick="App.closeModal('receive-batch-modal')">&times;</button>
+            </div>
+            <form id="receive-batch-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label required">Medicine Item</label>
+                        <select class="form-select" name="medicine_id" id="modal-med-select" required>
+                            <option value="">Select Medicine...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Batch Lot Number</label>
+                            <input class="form-input font-mono" type="text" name="batch_number" placeholder="e.g. MER-2026-08X" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Received Quantity</label>
+                            <input class="form-input" type="number" name="received_quantity" min="1" placeholder="e.g. 100" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Expiry Date</label>
+                            <input class="form-input" type="date" name="expiry_date" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Received Date</label>
+                            <input class="form-input" type="date" name="received_date" id="modal-rec-date" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Storage Location</label>
+                            <select class="form-select" name="storage_location_id" id="modal-loc-select" required>
+                                <option value="">Select Location...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Supplier / Source</label>
+                            <select class="form-select" name="supplier_id" id="modal-sup-select">
+                                <option value="">Select Supplier...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Unit Cost (INR ₹)</label>
+                            <input class="form-input" type="number" step="0.01" name="unit_cost" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Consignment Notes / PO Ref</label>
+                            <input class="form-input" type="text" name="notes" placeholder="e.g. PO-2026-9901">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="App.closeModal('receive-batch-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="save-batch-btn">Register Consignment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Adjust Batch Stock -->
+    <div class="modal-backdrop" id="adjust-batch-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Adjust Physical Batch Inventory</h3>
+                <button class="modal-close-btn" onclick="App.closeModal('adjust-batch-modal')">&times;</button>
+            </div>
+            <form id="adjust-batch-form">
+                <input type="hidden" name="batch_id" id="adjust-batch-id">
+                <div class="modal-body">
+                    <p class="text-sm text-secondary" style="margin-bottom:1rem;">
+                        Adjusting stock count for batch <strong class="font-mono" id="adjust-batch-num"></strong> (<span id="adjust-med-name"></span>).
+                    </p>
+                    <div class="form-group">
+                        <label class="form-label">Current Recorded On-Hand</label>
+                        <input class="form-input" type="text" id="adjust-cur-qty" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">Verified Physical Quantity</label>
+                        <input class="form-input" type="number" name="new_quantity" id="adjust-new-qty" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">Audit Adjustment Reason</label>
+                        <textarea class="form-textarea" name="reason" placeholder="Mandatory reason: e.g. Physical inventory count variance, shattered vial..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="App.closeModal('adjust-batch-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submit-adjust-btn">Log & Adjust Count</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/navigation.js"></script>
+    <script>
+        let batchesList = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Navigation.init('batches');
+            document.getElementById('modal-rec-date').value = new Date().toISOString().split('T')[0];
+            await loadDropdowns();
+            await loadBatches();
+
+            document.getElementById('search-input').addEventListener('input', App.debounce(loadBatches, 300));
+            document.getElementById('location-filter').addEventListener('change', loadBatches);
+            document.getElementById('receive-batch-form').addEventListener('submit', handleReceiveBatch);
+            document.getElementById('adjust-batch-form').addEventListener('submit', handleAdjustBatch);
+        });
+
+        async function loadDropdowns() {
+            try {
+                // Locations
+                const locRes = await API.get('/locations');
+                if (locRes && locRes.data) {
+                    const filter = document.getElementById('location-filter');
+                    const modalLoc = document.getElementById('modal-loc-select');
+                    locRes.data.forEach(l => {
+                        const o1 = document.createElement('option');
+                        o1.value = l.id;
+                        o1.textContent = l.name;
+                        filter.appendChild(o1);
+
+                        const o2 = document.createElement('option');
+                        o2.value = l.id;
+                        o2.textContent = `${l.name} (${l.temp_zone})`;
+                        modalLoc.appendChild(o2);
+                    });
+                }
+
+                // Suppliers
+                const supRes = await API.get('/suppliers');
+                if (supRes && supRes.data) {
+                    const modalSup = document.getElementById('modal-sup-select');
+                    supRes.data.forEach(s => {
+                        const o = document.createElement('option');
+                        o.value = s.id;
+                        o.textContent = s.name;
+                        modalSup.appendChild(o);
+                    });
+                }
+
+                // Medicines
+                const medRes = await API.get('/medicines', { limit: 100 });
+                if (medRes && medRes.data && medRes.data.items) {
+                    const modalMed = document.getElementById('modal-med-select');
+                    medRes.data.items.forEach(m => {
+                        const o = document.createElement('option');
+                        o.value = m.id;
+                        o.textContent = `${m.brand_name} (${m.strength} - ${m.sku})`;
+                        modalMed.appendChild(o);
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadBatches() {
+            const tbody = document.getElementById('batches-tbody');
+            const search = document.getElementById('search-input').value.trim();
+            const locationId = document.getElementById('location-filter').value;
+
+            try {
+                const res = await API.get('/batches', { search, location_id: locationId });
+                if (!res || !res.data) return;
+                batchesList = res.data;
+
+                if (batchesList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="12" class="text-center text-muted" style="padding:2.5rem;">No batches found matching filter.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = batchesList.map(b => {
+                    const days = parseInt(b.days_remaining);
+                    return `
+                        <tr>
+                            <td class="font-mono font-bold">${App.escapeHtml(b.batch_number)}</td>
+                            <td>
+                                <a href="/medicine-details.html?id=${b.medicine_id}" style="color:var(--primary); font-weight:600;">
+                                    ${App.escapeHtml(b.brand_name)}
+                                </a>
+                                <div class="text-muted text-xs">${App.escapeHtml(b.generic_name)}</div>
+                            </td>
+                            <td>${App.escapeHtml(b.location_name)}</td>
+                            <td class="text-muted text-xs">${App.escapeHtml(b.supplier_name || 'Direct')}</td>
+                            <td><strong>${App.formatDate(b.expiry_date)}</strong></td>
+                            <td>${days}d</td>
+                            <td><strong>${b.current_quantity}</strong></td>
+                            <td class="text-muted">${b.reserved_quantity}</td>
+                            <td><strong style="color:var(--primary);">${b.available_units}</strong></td>
+                            <td class="text-muted">${App.formatCurrency(b.unit_cost)}</td>
+                            <td>${App.renderUrgencyBadge(b.calculated_urgency, days)}</td>
+                            <td class="text-right">
+                                <button class="btn btn-secondary btn-sm" onclick="openAdjustModal(${b.id})">
+                                    ${App.icon('edit')} <span>Adjust</span>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                App.toast('error', 'Failed to load batches');
+                console.error(err);
+            }
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('location-filter').value = '0';
+            loadBatches();
+        }
+
+        function openReceiveBatchModal() {
+            document.getElementById('receive-batch-form').reset();
+            document.getElementById('modal-rec-date').value = new Date().toISOString().split('T')[0];
+            App.openModal('receive-batch-modal');
+        }
+
+        async function handleReceiveBatch(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('save-batch-btn');
+
+            const payload = {
+                medicine_id: parseInt(form.medicine_id.value),
+                batch_number: form.batch_number.value.trim(),
+                received_quantity: parseInt(form.received_quantity.value),
+                expiry_date: form.expiry_date.value,
+                received_date: form.received_date.value,
+                storage_location_id: parseInt(form.storage_location_id.value),
+                supplier_id: form.supplier_id.value ? parseInt(form.supplier_id.value) : null,
+                unit_cost: parseFloat(form.unit_cost.value || 0),
+                notes: form.notes.value.trim()
+            };
+
+            btn.disabled = true;
+            btn.textContent = 'Registering...';
+
+            try {
+                await API.post('/batches', payload);
+                App.toast('success', `Batch ${payload.batch_number} consignment recorded successfully`);
+                App.closeModal('receive-batch-modal');
+                await loadBatches();
+            } catch (err) {
+                App.toast('error', err.message || 'Failed to register batch');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Register Consignment';
+            }
+        }
+
+        function openAdjustModal(batchId) {
+            const b = batchesList.find(x => x.id == batchId);
+            if (!b) return;
+
+            document.getElementById('adjust-batch-id').value = b.id;
+            document.getElementById('adjust-batch-num').textContent = b.batch_number;
+            document.getElementById('adjust-med-name').textContent = b.brand_name;
+            document.getElementById('adjust-cur-qty').value = b.current_quantity;
+            document.getElementById('adjust-new-qty').value = b.current_quantity;
+            App.openModal('adjust-batch-modal');
+        }
+
+        async function handleAdjustBatch(e) {
+            e.preventDefault();
+            const form = e.target;
+            const batchId = form.batch_id.value;
+            const btn = document.getElementById('submit-adjust-btn');
+
+            const payload = {
+                new_quantity: parseInt(form.new_quantity.value),
+                reason: form.reason.value.trim()
+            };
+
+            btn.disabled = true;
+            btn.textContent = 'Updating...';
+
+            try {
+                await API.post(`/batches/${batchId}/adjust`, payload);
+                App.toast('success', 'Batch count adjusted and logged in audit ledger');
+                App.closeModal('adjust-batch-modal');
+                await loadBatches();
+            } catch (err) {
+                App.toast('error', err.message || 'Adjustment failed');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Log & Adjust Count';
+            }
+        }
+    </script>
+</body>
+</html>

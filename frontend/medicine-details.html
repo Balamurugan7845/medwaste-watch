@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Details & Batches — MedWaste Watch</title>
+    <link rel="stylesheet" href="/assets/css/variables.css">
+    <link rel="stylesheet" href="/assets/css/reset.css">
+    <link rel="stylesheet" href="/assets/css/typography.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/forms.css">
+    <link rel="stylesheet" href="/assets/css/tables.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <script src="/assets/js/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="app-main">
+            <div id="topbar-container"></div>
+
+            <main class="content-container">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <div style="margin-bottom: 0.35rem;">
+                            <a href="/medicines.html" class="btn btn-secondary btn-sm">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+                                <span>Back to Catalog</span>
+                            </a>
+                        </div>
+                        <h1 id="med-title">Loading Medicine...</h1>
+                        <p id="med-subtitle" class="text-muted">Master specifications, inventory allocation, and active batches.</p>
+                    </div>
+                    <div class="page-actions">
+                        <a id="btn-find-alts" href="/alternatives.html" class="btn btn-outline">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+                            <span>Find Alternatives</span>
+                        </a>
+                        <a id="btn-new-res" href="/reservations.html" class="btn btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/></svg>
+                            <span>Reserve Stock</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Stock Breakdown Tiles -->
+                <div class="kpi-grid">
+                    <div class="kpi-card kpi-cyan">
+                        <div class="kpi-info">
+                            <span class="kpi-label">Physical On-Hand</span>
+                            <span class="kpi-value" id="stock-on-hand">0</span>
+                            <span class="kpi-meta">All hospital storage vaults</span>
+                        </div>
+                        <div class="kpi-icon-box">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-warning">
+                        <div class="kpi-info">
+                            <span class="kpi-label">Active Reserved</span>
+                            <span class="kpi-value" id="stock-reserved">0</span>
+                            <span class="kpi-meta">Allocated to pending ward orders</span>
+                        </div>
+                        <div class="kpi-icon-box">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-success">
+                        <div class="kpi-info">
+                            <span class="kpi-label">Available-to-Reserve</span>
+                            <span class="kpi-value" id="stock-available">0</span>
+                            <span class="kpi-meta">Eligible unreserved stock</span>
+                        </div>
+                        <div class="kpi-icon-box">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-critical">
+                        <div class="kpi-info">
+                            <span class="kpi-label">Quarantined / Expired</span>
+                            <span class="kpi-value" id="stock-quarantined">0</span>
+                            <span class="kpi-meta">Ineligible for dispensing</span>
+                        </div>
+                        <div class="kpi-icon-box">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Medicine Specs Card -->
+                <div class="card" style="margin-bottom: 1.75rem;">
+                    <div class="card-header">
+                        <h2 class="card-title">Clinical Specifications & Metadata</h2>
+                        <span id="badge-status-container"></span>
+                    </div>
+                    <div class="specs-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem;">
+                        <div>
+                            <div class="text-xs text-muted font-bold uppercase">Item SKU</div>
+                            <div class="font-mono text-base font-bold" id="spec-sku">—</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-muted font-bold uppercase">Generic API Name</div>
+                            <div class="text-base" id="spec-generic">—</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-muted font-bold uppercase">Therapeutic Category</div>
+                            <div class="text-base" id="spec-category">—</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-muted font-bold uppercase">Strength & Dosage Form</div>
+                            <div class="text-base" id="spec-strength">—</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-muted font-bold uppercase">Reorder Level Threshold</div>
+                            <div class="text-base font-bold" id="spec-reorder">—</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-muted font-bold uppercase">Manufacturer</div>
+                            <div class="text-base" id="spec-mfg">—</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
+                        <div class="text-xs text-muted font-bold uppercase" style="margin-bottom:0.25rem;">Clinical Description / Notes</div>
+                        <p class="text-secondary text-sm" id="spec-desc">No description registered.</p>
+                    </div>
+                </div>
+
+                <!-- Batches Table in FEFO Order -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            <span>Consignment Batches (FEFO Dispensing Sequence)</span>
+                        </h2>
+                        <a href="/batches.html" class="btn btn-secondary btn-sm">Receive New Batch</a>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Batch Number</th>
+                                    <th>Storage Location</th>
+                                    <th>Supplier</th>
+                                    <th>Received Date</th>
+                                    <th>Expiry Date</th>
+                                    <th>On-Hand</th>
+                                    <th>Reserved</th>
+                                    <th>Quarantined</th>
+                                    <th>Available</th>
+                                    <th>Expiry Urgency</th>
+                                </tr>
+                            </thead>
+                            <tbody id="batches-tbody">
+                                <tr><td colspan="10" class="text-center text-muted" style="padding:2rem;">Loading batch inventory...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/navigation.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const medicineId = parseInt(urlParams.get('id'));
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!medicineId) {
+                window.location.replace('/medicines.html');
+                return;
+            }
+            await Navigation.init('medicines');
+            await loadMedicineDetails();
+        });
+
+        async function loadMedicineDetails() {
+            try {
+                const res = await API.get(`/medicines/${medicineId}`);
+                if (!res || !res.data) {
+                    App.toast('error', 'Medicine record not found');
+                    return;
+                }
+                const m = res.data;
+
+                document.getElementById('med-title').textContent = m.brand_name;
+                document.getElementById('med-subtitle').textContent = `${m.generic_name} — ${m.strength} (${m.dosage_form})`;
+                document.getElementById('spec-sku').textContent = m.sku;
+                document.getElementById('spec-generic').textContent = m.generic_name;
+                document.getElementById('spec-category').textContent = m.category_name;
+                document.getElementById('spec-strength').textContent = `${m.strength} (${m.dosage_form})`;
+                document.getElementById('spec-reorder').textContent = `${m.reorder_level} ${m.unit_of_measure}`;
+                document.getElementById('spec-mfg').textContent = m.manufacturer || 'Unspecified';
+                document.getElementById('spec-desc').textContent = m.description || 'Standard hospital formulary item.';
+
+                // Stock numbers
+                document.getElementById('stock-on-hand').textContent = m.physical_on_hand;
+                document.getElementById('stock-reserved').textContent = m.reserved_quantity;
+                document.getElementById('stock-available').textContent = m.available_to_reserve;
+                document.getElementById('stock-quarantined').textContent = m.quarantined_quantity;
+
+                // Action links
+                document.getElementById('btn-find-alts').href = `/alternatives.html?medicine_id=${m.id}`;
+                document.getElementById('btn-new-res').href = `/reservations.html?medicine_id=${m.id}`;
+
+                // Status badge
+                const health = m.available_to_reserve <= 0 ? 'out_of_stock' : (m.available_to_reserve <= m.reorder_level ? 'low_stock' : 'adequate');
+                document.getElementById('badge-status-container').innerHTML = App.renderStockBadge(health);
+
+                // Render batches
+                const tbody = document.getElementById('batches-tbody');
+                if (!m.batches || m.batches.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted" style="padding:2rem;">No batches registered for this medicine.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = m.batches.map(b => {
+                    const days = parseInt(b.days_to_expiry);
+                    const urgency = days <= 0 ? 'expired' : (days <= 7 ? 'urgent' : (days <= 30 ? 'warning' : 'safe'));
+                    return `
+                        <tr>
+                            <td class="font-mono font-bold">${App.escapeHtml(b.batch_number)}</td>
+                            <td>${App.escapeHtml(b.location_name)}</td>
+                            <td class="text-muted text-xs">${App.escapeHtml(b.supplier_name || 'Standard Vendor')}</td>
+                            <td class="text-muted text-xs">${App.formatDate(b.received_date)}</td>
+                            <td><strong>${App.formatDate(b.expiry_date)}</strong></td>
+                            <td>${b.current_quantity}</td>
+                            <td class="text-muted">${b.reserved_quantity}</td>
+                            <td style="color:${b.quarantined_quantity > 0 ? 'var(--critical)' : 'inherit'};">${b.quarantined_quantity}</td>
+                            <td><strong style="color:var(--primary);">${b.available_units}</strong></td>
+                            <td>${App.renderUrgencyBadge(urgency, days)}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                App.toast('error', 'Failed to load medicine details.');
+                console.error(err);
+            }
+        }
+    </script>
+</body>
+</html>

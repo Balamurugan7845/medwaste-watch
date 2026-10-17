@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biomedical Waste & Approved Disposal — MedWaste Watch</title>
+    <link rel="stylesheet" href="/assets/css/variables.css">
+    <link rel="stylesheet" href="/assets/css/reset.css">
+    <link rel="stylesheet" href="/assets/css/typography.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/forms.css">
+    <link rel="stylesheet" href="/assets/css/tables.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <script src="/assets/js/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="app-main">
+            <div id="topbar-container"></div>
+
+            <main class="content-container">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--critical);"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                            <span>Biomedical Waste & Authorized Disposal</span>
+                        </h1>
+                        <p>Permanent compliance destruction logs, certified hazmat incinerations, and financial wastage audits.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-danger" onclick="openRecordDisposalModal()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            <span>Record Approved Destruction</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Compliance Notice -->
+                <div class="card" style="background:var(--critical-bg); border-color:var(--critical-border); margin-bottom:1.5rem;">
+                    <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--critical); flex-shrink:0; margin-top:2px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        <div>
+                            <div class="font-bold text-sm" style="color:var(--critical-text);">Clinical Waste Regulatory Compliance Notice</div>
+                            <div class="text-xs" style="color:var(--text-secondary); margin-top:0.25rem;">
+                                In accordance with hospital biomedical waste management rules, expired and contaminated medications are permanently logged in the movement ledger. Destruction records require authorization from licensed pharmacy leadership.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Disposal Log Table -->
+                <div class="data-table-container">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Disposal Ref #</th>
+                                    <th>Date Disposed</th>
+                                    <th>Medicine Name</th>
+                                    <th>Batch Lot</th>
+                                    <th>Destroyed Qty</th>
+                                    <th>Financial Loss</th>
+                                    <th>Disposal Protocol</th>
+                                    <th>Destruction Reason</th>
+                                    <th>Authorized Officer</th>
+                                    <th>Hazmat Certificate</th>
+                                </tr>
+                            </thead>
+                            <tbody id="disposal-tbody">
+                                <tr><td colspan="10" class="text-center text-muted" style="padding:2.5rem;">Loading approved disposal records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal: Record Approved Disposal -->
+    <div class="modal-backdrop" id="record-disposal-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Record Authorized Biomedical Medicine Disposal</h3>
+                <button class="modal-close-btn" onclick="App.closeModal('record-disposal-modal')">&times;</button>
+            </div>
+            <form id="record-disposal-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label required">Target Expired / Quarantined Batch</label>
+                        <select class="form-select font-mono" name="batch_id" id="modal-disp-batch" required>
+                            <option value="">Select Batch Lot...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Quantity to Dispose</label>
+                            <input class="form-input" type="number" name="quantity" id="modal-disp-qty" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Authorized Disposal Protocol</label>
+                            <select class="form-select" name="disposal_method" required>
+                                <option value="incineration">Certified High-Temp Incineration</option>
+                                <option value="chemical_neutralization">Chemical Neutralization & Autoclave</option>
+                                <option value="return_to_supplier">Return to Supplier / Recall</option>
+                                <option value="certified_hazmat">Certified Third-Party Hazmat Waste</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Condemnation Reason</label>
+                            <select class="form-select" name="reason" required>
+                                <option value="expired">Expired Beyond Clinical Shelf-Life</option>
+                                <option value="contaminated">Contaminated / Cold Chain Breakdown</option>
+                                <option value="damaged">Shattered / Packaging Integrity Compromised</option>
+                                <option value="recalled">Manufacturer / Drug Authority Recall</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Destruction Certificate Ref #</label>
+                            <input class="form-input font-mono" type="text" name="certificate_ref" placeholder="e.g. HAZMAT-2026-CERT-009">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Compliance Notes</label>
+                        <textarea class="form-textarea" name="notes" placeholder="Witnessed by licensed pharmacy supervisor..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="App.closeModal('record-disposal-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-danger" id="btn-submit-disposal">Authorize & Record Disposal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Navigation.init('disposal');
+            await loadDisposalLogs();
+            await loadBatchOptions();
+
+            document.getElementById('record-disposal-form').addEventListener('submit', handleRecordDisposal);
+        });
+
+        async function loadBatchOptions() {
+            try {
+                const res = await API.get('/batches');
+                if (res && res.data) {
+                    const sel = document.getElementById('modal-disp-batch');
+                    res.data.forEach(b => {
+                        const opt = document.createElement('option');
+                        opt.value = b.id;
+                        opt.textContent = `${b.batch_number} — ${b.brand_name} (${b.current_quantity} on-hand, Exp: ${App.formatDate(b.expiry_date)})`;
+                        sel.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadDisposalLogs() {
+            const tbody = document.getElementById('disposal-tbody');
+            try {
+                const res = await API.get('/disposals');
+                if (!res || !res.data) return;
+
+                if (res.data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted" style="padding:2.5rem;">No biomedical disposal records found.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = res.data.map(d => `
+                    <tr>
+                        <td class="font-mono font-bold">${App.escapeHtml(d.disposal_number)}</td>
+                        <td class="text-muted text-xs">${App.formatDateTime(d.disposed_at)}</td>
+                        <td>
+                            <strong>${App.escapeHtml(d.brand_name)}</strong>
+                            <div class="text-muted text-xs">${App.escapeHtml(d.generic_name)}</div>
+                        </td>
+                        <td class="font-mono text-xs">${App.escapeHtml(d.batch_number)}</td>
+                        <td><strong style="color:var(--critical);">${d.quantity}</strong> units</td>
+                        <td style="font-weight:600;">${App.formatCurrency(d.total_financial_loss)}</td>
+                        <td><span class="badge badge-neutral" style="text-transform:capitalize;">${App.escapeHtml(d.disposal_method.replace('_', ' '))}</span></td>
+                        <td><span class="badge badge-urgent">${App.escapeHtml(d.reason)}</span></td>
+                        <td class="text-secondary text-xs">${App.escapeHtml(d.authorized_by_name)}</td>
+                        <td class="font-mono text-xs text-muted">${App.escapeHtml(d.certificate_ref || 'Internal Form')}</td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                App.toast('error', 'Failed to load disposal records');
+                console.error(err);
+            }
+        }
+
+        function openRecordDisposalModal() {
+            document.getElementById('record-disposal-form').reset();
+            App.openModal('record-disposal-modal');
+        }
+
+        async function handleRecordDisposal(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('btn-submit-disposal');
+
+            const payload = {
+                batch_id: parseInt(form.batch_id.value),
+                quantity: parseInt(form.quantity.value),
+                disposal_method: form.disposal_method.value,
+                reason: form.reason.value,
+                certificate_ref: form.certificate_ref.value.trim(),
+                notes: form.notes.value.trim()
+            };
+
+            btn.disabled = true;
+            btn.textContent = 'Processing disposal...';
+
+            try {
+                await API.post('/disposals', payload);
+                App.toast('success', 'Biomedical destruction recorded and deducted from inventory');
+                App.closeModal('record-disposal-modal');
+                await loadDisposalLogs();
+            } catch (err) {
+                App.toast('error', err.message || 'Failed to record disposal');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Authorize & Record Disposal';
+            }
+        }
+    </script>
+</body>
+</html>

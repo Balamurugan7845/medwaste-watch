@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Departments & Wards — MedWaste Watch</title>
+    <link rel="stylesheet" href="/assets/css/variables.css">
+    <link rel="stylesheet" href="/assets/css/reset.css">
+    <link rel="stylesheet" href="/assets/css/typography.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/forms.css">
+    <link rel="stylesheet" href="/assets/css/tables.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <script src="/assets/js/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="app-main">
+            <div id="topbar-container"></div>
+
+            <main class="content-container">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+                            <span>Hospital Departments & Clinical Units</span>
+                        </h1>
+                        <p>Trauma bays, ICUs, surgical suites, and satellite medicine storage facilities.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="openAddDeptModal()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            <span>Add Clinical Ward</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="data-table-container">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Ward Code</th>
+                                    <th>Department Name</th>
+                                    <th>Physical Location</th>
+                                    <th>Direct Hotline</th>
+                                    <th>Active Staff</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dept-tbody">
+                                <tr><td colspan="6" class="text-center text-muted" style="padding:2.5rem;">Loading hospital departments...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal: Add Department -->
+    <div class="modal-backdrop" id="add-dept-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Register Hospital Ward / Clinical Unit</h3>
+                <button class="modal-close-btn" onclick="App.closeModal('add-dept-modal')">&times;</button>
+            </div>
+            <form id="add-dept-form">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Department Name</label>
+                            <input class="form-input" type="text" name="name" placeholder="e.g. Oncology Ward 4B" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Ward Code</label>
+                            <input class="form-input font-mono" type="text" name="code" placeholder="e.g. ONC-06" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Hospital Location</label>
+                            <input class="form-input" type="text" name="location" placeholder="e.g. 4th Floor, East Wing">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Extension Hotline</label>
+                            <input class="form-input" type="text" name="phone" placeholder="+91 44 2800 1006">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="App.closeModal('add-dept-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-dept">Save Department</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Navigation.init('departments');
+            await loadDepartments();
+            document.getElementById('add-dept-form').addEventListener('submit', handleAddDept);
+        });
+
+        async function loadDepartments() {
+            const tbody = document.getElementById('dept-tbody');
+            try {
+                const res = await API.get('/departments');
+                if (!res || !res.data) return;
+
+                tbody.innerHTML = res.data.map(d => `
+                    <tr>
+                        <td class="font-mono font-bold">${App.escapeHtml(d.code)}</td>
+                        <td><strong>${App.escapeHtml(d.name)}</strong></td>
+                        <td class="text-muted">${App.escapeHtml(d.location || '—')}</td>
+                        <td class="font-mono text-sm">${App.escapeHtml(d.phone || '—')}</td>
+                        <td><span class="badge badge-info">${d.total_staff || 0} Staff</span></td>
+                        <td><span class="badge badge-safe">Active</span></td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                App.toast('error', 'Failed to load departments');
+            }
+        }
+
+        function openAddDeptModal() {
+            document.getElementById('add-dept-form').reset();
+            App.openModal('add-dept-modal');
+        }
+
+        async function handleAddDept(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('btn-save-dept');
+
+            const payload = {
+                name: form.name.value.trim(),
+                code: form.code.value.trim(),
+                location: form.location.value.trim(),
+                phone: form.phone.value.trim()
+            };
+
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                await API.post('/departments', payload);
+                App.toast('success', `Department ${payload.name} created successfully`);
+                App.closeModal('add-dept-modal');
+                await loadDepartments();
+            } catch (err) {
+                App.toast('error', err.message || 'Failed to create department');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save Department';
+            }
+        }
+    </script>
+</body>
+</html>

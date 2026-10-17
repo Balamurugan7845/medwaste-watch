@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Low Stock & Shortage Replenishment — MedWaste Watch</title>
+    <link rel="stylesheet" href="/assets/css/variables.css">
+    <link rel="stylesheet" href="/assets/css/reset.css">
+    <link rel="stylesheet" href="/assets/css/typography.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/forms.css">
+    <link rel="stylesheet" href="/assets/css/tables.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <script src="/assets/js/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="app-main">
+            <div id="topbar-container"></div>
+
+            <main class="content-container">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--warning);"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m17 19-5 3-5-3"/></svg>
+                            <span>Low-Stock & Shortage Replenishment</span>
+                        </h1>
+                        <p>Hospital reorder points, available-to-reserve calculations, and vendor replenishment deficit monitoring.</p>
+                    </div>
+                    <div class="page-actions">
+                        <a href="/batches.html" class="btn btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            <span>Receive Replenishment PO</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Stock Formula Documentation Banner -->
+                <div class="card" style="background-color: var(--success-bg); border-color: var(--success-border); margin-bottom: 1.5rem;">
+                    <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--success); flex-shrink:0; margin-top:2px;"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                        <div>
+                            <div class="font-bold text-sm" style="color:var(--success-text);">Clinical Inventory Availability Formula</div>
+                            <div class="text-xs" style="color:var(--text-secondary); margin-top:0.25rem;">
+                                <code>Available-to-Reserve = (Total Physical On-Hand) - (Quarantined Units) - (Expired Units) - (Active Ward Reservations)</code>.<br>
+                                Ineligible stock (expired shelf-life or damaged/quarantine) is never counted toward available hospital supply.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shortage Data Table -->
+                <div class="data-table-container">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Medicine Name</th>
+                                    <th>Category</th>
+                                    <th>Physical On-Hand</th>
+                                    <th>Reserved</th>
+                                    <th>Quarantined</th>
+                                    <th>Available to Reserve</th>
+                                    <th>Hospital Reorder Level</th>
+                                    <th>Deficit to Reorder</th>
+                                    <th>Shortage Severity</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="shortages-tbody">
+                                <tr><td colspan="11" class="text-center text-muted" style="padding:2.5rem;">Scanning catalog against reorder thresholds...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Navigation.init('low-stock');
+            await loadShortages();
+        });
+
+        async function loadShortages() {
+            const tbody = document.getElementById('shortages-tbody');
+            try {
+                const res = await API.get('/medicines', { limit: 100 });
+                if (!res || !res.data) return;
+
+                // Filter only medicines where available_to_reserve <= reorder_level
+                const shortages = res.data.items.filter(m => {
+                    const avail = parseInt(m.available_to_reserve);
+                    const reorder = parseInt(m.reorder_level);
+                    return avail <= reorder;
+                });
+
+                if (shortages.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="11" class="text-center text-muted" style="padding:2.5rem;">All medicines currently meet or exceed hospital reorder safety levels.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = shortages.map(m => {
+                    const avail = parseInt(m.available_to_reserve);
+                    const reorder = parseInt(m.reorder_level);
+                    const deficit = Math.max(0, reorder - avail);
+                    const isOutOfStock = avail <= 0;
+
+                    return `
+                        <tr>
+                            <td class="font-mono text-sm">${App.escapeHtml(m.sku)}</td>
+                            <td>
+                                <a href="/medicine-details.html?id=${m.id}" style="color:var(--primary); font-weight:600;">
+                                    ${App.escapeHtml(m.brand_name)}
+                                </a>
+                                <div class="text-muted text-xs">${App.escapeHtml(m.generic_name)} (${App.escapeHtml(m.strength)})</div>
+                            </td>
+                            <td class="text-muted">${App.escapeHtml(m.category_name)}</td>
+                            <td><strong>${m.physical_on_hand}</strong></td>
+                            <td class="text-muted">${m.reserved_quantity}</td>
+                            <td style="color:${m.quarantined_quantity > 0 ? 'var(--critical)' : 'inherit'};">${m.quarantined_quantity}</td>
+                            <td><strong style="color:${isOutOfStock ? 'var(--critical)' : 'var(--warning)'}; font-size:1.05rem;">${avail}</strong> ${App.escapeHtml(m.unit_of_measure)}</td>
+                            <td><strong>${reorder}</strong></td>
+                            <td style="color:var(--critical); font-weight:700;">+${deficit} ${App.escapeHtml(m.unit_of_measure)}</td>
+                            <td>
+                                ${isOutOfStock 
+                                    ? `<span class="badge badge-urgent"><span class="badge-dot"></span>Out of Stock</span>` 
+                                    : `<span class="badge badge-warning"><span class="badge-dot"></span>Low Stock Shortage</span>`}
+                            </td>
+                            <td class="text-right" style="white-space:nowrap;">
+                                <a href="/alternatives.html?medicine_id=${m.id}" class="btn btn-outline btn-sm" title="Find therapeutic alternatives">${App.icon('swap')} <span>Find Alts</span></a>
+                                <a href="/batches.html" class="btn btn-secondary btn-sm" title="Order / Receive PO">${App.icon('plus')} <span>Receive PO</span></a>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                App.toast('error', 'Failed to calculate stock shortage analysis');
+                console.error(err);
+            }
+        }
+    </script>
+</body>
+</html>

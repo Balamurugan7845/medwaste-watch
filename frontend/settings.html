@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Settings & Policies — MedWaste Watch</title>
+    <link rel="stylesheet" href="/assets/css/variables.css">
+    <link rel="stylesheet" href="/assets/css/reset.css">
+    <link rel="stylesheet" href="/assets/css/typography.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/forms.css">
+    <link rel="stylesheet" href="/assets/css/tables.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <script src="/assets/js/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="app-main">
+            <div id="topbar-container"></div>
+
+            <main class="content-container">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <span>Hospital Settings & Inventory Policies</span>
+                        </h1>
+                        <p>Configure shelf-life warning windows, reservation timeout durations, UI theme preferences, and regulatory quarantine protocols.</p>
+                    </div>
+                </div>
+
+                <!-- Theme Selection Card -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                            <span>Interface Theme & Display Appearance</span>
+                        </h2>
+                        <span class="badge badge-info text-xs">Live Preview</span>
+                    </div>
+                    <p class="text-sm text-muted" style="margin-bottom: 1rem;">
+                        Choose your preferred clinical display mode. Changes take effect instantly and apply across all hospital workstations.
+                    </p>
+                    <div class="theme-selector-grid">
+                        <div class="theme-option-card" data-theme-val="light" onclick="selectTheme('light')">
+                            <div class="theme-option-check">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="theme-option-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+                            </div>
+                            <div class="theme-option-title">Light Mode</div>
+                            <div class="theme-option-desc">Clinical Daylight contrast with clean white surfaces and teal accents.</div>
+                        </div>
+
+                        <div class="theme-option-card" data-theme-val="dark" onclick="selectTheme('dark')">
+                            <div class="theme-option-check">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="theme-option-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                            </div>
+                            <div class="theme-option-title">Dark Mode</div>
+                            <div class="theme-option-desc">OLED-friendly dark slate for night shift rounds and reduced eye fatigue.</div>
+                        </div>
+
+                        <div class="theme-option-card" data-theme-val="system" onclick="selectTheme('system')">
+                            <div class="theme-option-check">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                            </div>
+                            <div class="theme-option-icon">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+                            </div>
+                            <div class="theme-option-title">System Default</div>
+                            <div class="theme-option-desc">Automatically synchronizes with your operating system light/dark schedule.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="settings-form">
+                    <div class="settings-grid">
+                        <!-- Hospital Profile -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Hospital Enterprise Identity</h2>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Hospital Facility Name</label>
+                                <input class="form-input" type="text" name="hospital_name" id="set-hospital_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Facility Clinical Licensing Code</label>
+                                <input class="form-input font-mono" type="text" name="hospital_code" id="set-hospital_code" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Server Operational Timezone</label>
+                                <select class="form-select" name="timezone" id="set-timezone" required>
+                                    <option value="Asia/Kolkata">Asia/Kolkata (IST - UTC+05:30)</option>
+                                    <option value="UTC">UTC (Coordinated Universal Time)</option>
+                                    <option value="America/New_York">America/New_York (EST)</option>
+                                    <option value="Europe/London">Europe/London (GMT)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Shelf-Life & Expiry Thresholds -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 class="card-title">Shelf-Life & Expiry Urgency Windows</h2>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Critical Urgent Window (Days)</label>
+                                <input class="form-input" type="number" name="expiry_urgent_days" id="set-expiry_urgent_days" min="1" max="60" required>
+                                <div class="form-hint">Batches with days remaining ≤ this trigger critical alerts and immediate FEFO priority</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label required">Warning Advisory Window (Days)</label>
+                                <input class="form-input" type="number" name="expiry_warning_days" id="set-expiry_warning_days" min="10" max="180" required>
+                                <div class="form-hint">Batches entering this window appear on the advisory queue</div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Auto-Quarantine on Expiry</label>
+                                <select class="form-select" name="quarantine_auto_on_expiry" id="set-quarantine_auto_on_expiry">
+                                    <option value="1">Enabled (Immediately lock expired batches from ward reservations)</option>
+                                    <option value="0">Disabled (Manual pharmacist review)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Reservation & Dispensing Rules -->
+                        <div class="card" style="grid-column: 1 / -1;">
+                            <div class="card-header">
+                                <h2 class="card-title">Clinical Reservation & Dispensing Policies</h2>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label required">Reservation Pickup Timeout (Hours)</label>
+                                    <input class="form-input" type="number" name="reservation_timeout_hours" id="set-reservation_timeout_hours" min="1" max="168" required>
+                                    <div class="form-hint">Uncollected reservations automatically expire and return units to stock</div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label required">FEFO Dispensing Enforcement</label>
+                                    <select class="form-select" name="fefo_strict_mode" id="set-fefo_strict_mode">
+                                        <option value="1">Strict Mode (Earliest expiry batches must be allocated first)</option>
+                                        <option value="0">Flexible Mode</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label required">Doctor Substitution Approval Protocol</label>
+                                    <select class="form-select" name="require_doctor_sub_approval" id="set-require_doctor_sub_approval">
+                                        <option value="1">Mandatory (Attending physician sign-off required for substitutes)</option>
+                                        <option value="0">Pharmacist Discretion</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div style="margin-top:1rem; display:flex; justify-content:flex-end;">
+                                <button type="submit" class="btn btn-primary" id="btn-save-settings">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <span>Save Configuration Changes</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Navigation.init('settings');
+            if (window.Theme) {
+                Theme.updateUI(Theme.getPreference(), Theme.getResolvedTheme());
+            }
+
+            if (!Auth.hasRole('super_admin')) {
+                App.toast('error', 'Only super administrators can edit hospital settings.');
+                window.location.replace('/dashboard.html');
+                return;
+            }
+            await loadSettings();
+            document.getElementById('settings-form').addEventListener('submit', handleSaveSettings);
+        });
+
+        function selectTheme(val) {
+            if (window.Theme) {
+                Theme.setTheme(val);
+            }
+        }
+
+        async function loadSettings() {
+            try {
+                const res = await API.get('/settings');
+                if (!res || !res.data) return;
+
+                res.data.forEach(s => {
+                    const el = document.getElementById(`set-${s.setting_key}`);
+                    if (el) {
+                        el.value = s.setting_value;
+                    }
+                });
+            } catch (err) {
+                App.toast('error', 'Failed to load system settings');
+            }
+        }
+
+        async function handleSaveSettings(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('btn-save-settings');
+
+            const settings = {
+                hospital_name: form.hospital_name.value.trim(),
+                hospital_code: form.hospital_code.value.trim(),
+                timezone: form.timezone.value,
+                expiry_urgent_days: form.expiry_urgent_days.value,
+                expiry_warning_days: form.expiry_warning_days.value,
+                quarantine_auto_on_expiry: form.quarantine_auto_on_expiry.value,
+                reservation_timeout_hours: form.reservation_timeout_hours.value,
+                fefo_strict_mode: form.fefo_strict_mode.value,
+                require_doctor_sub_approval: form.require_doctor_sub_approval.value
+            };
+
+            btn.disabled = true;
+            btn.innerHTML = `<span>Updating settings...</span>`;
+
+            try {
+                await API.put('/settings', { settings });
+                App.toast('success', 'Hospital configuration and policy settings updated');
+            } catch (err) {
+                App.toast('error', err.message || 'Failed to update settings');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>Save Configuration Changes</span>`;
+            }
+        }
+    </script>
+</body>
+</html>

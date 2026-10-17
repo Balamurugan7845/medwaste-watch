@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expiry Priority Dashboard — MedWaste Watch</title>
+    <link rel="stylesheet" href="/assets/css/variables.css">
+    <link rel="stylesheet" href="/assets/css/reset.css">
+    <link rel="stylesheet" href="/assets/css/typography.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/forms.css">
+    <link rel="stylesheet" href="/assets/css/tables.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <script src="/assets/js/theme.js"></script>
+    <style>
+        .tabs-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all var(--transition-fast);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .tab-btn:hover {
+            background-color: var(--bg-surface-secondary);
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .tab-badge {
+            font-size: 0.70rem;
+            padding: 0.15rem 0.45rem;
+            border-radius: var(--radius-full);
+            background-color: var(--neutral-badge);
+            color: var(--neutral-text);
+        }
+
+        .tab-btn.active .tab-badge {
+            background-color: var(--primary);
+            color: #FFFFFF;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="app-main">
+            <div id="topbar-container"></div>
+
+            <main class="content-container">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--critical);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                            <span>Expiry Priority Dashboard</span>
+                        </h1>
+                        <p>Hospital shelf-life monitoring, FEFO utilization queues, and automated quarantine isolation.</p>
+                    </div>
+                    <div class="page-actions">
+                        <a href="/disposal.html" class="btn btn-secondary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+                            <span>Disposal Management</span>
+                        </a>
+                        <a href="/reports.html?type=batch_wise" class="btn btn-primary">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            <span>Export Expiry CSV</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- KPI Metric Tiles -->
+                <div class="kpi-grid">
+                    <div class="kpi-card kpi-critical" onclick="setUrgencyFilter('urgent')" style="cursor:pointer;">
+                        <div class="kpi-info">
+                            <span class="kpi-label">Urgent (≤ 7 Days)</span>
+                            <span class="kpi-value" id="kpi-urgent-count">0</span>
+                            <span class="kpi-meta"><span class="badge badge-urgent">Immediate FEFO action</span></span>
+                        </div>
+                        <div class="kpi-icon-box">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-warning" onclick="setUrgencyFilter('warning')" style="cursor:pointer;">
+                        <div class="kpi-info">
+                            <span class="kpi-label">Warning (8–30 Days)</span>
+                            <span class="kpi-value" id="kpi-warning-count">0</span>
+                            <span class="kpi-meta"><span class="badge badge-warning">Advisory window</span></span>
+                        </div>
+                        <div class="kpi-icon-box">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-success" onclick="setUrgencyFilter('safe')" style="cursor:pointer;">
+                        <div class="kpi-info">
+                            <span class="kpi-label">Safe (> 30 Days)</span>
+                            <span class="kpi-value" id="kpi-safe-count">0</span>
+                            <span class="kpi-meta"><span class="badge badge-safe">Healthy reserve</span></span>
+                        </div>
+                        <div class="kpi-icon-box">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-cyan" onclick="setUrgencyFilter('expired')" style="cursor:pointer;">
+                        <div class="kpi-info">
+                            <span class="kpi-label">Expired / Quarantined</span>
+                            <span class="kpi-value" id="kpi-expired-count">0</span>
+                            <span class="kpi-meta">Awaiting biohazard disposal</span>
+                        </div>
+                        <div class="kpi-icon-box">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Urgency Navigation Tabs -->
+                <div class="tabs-nav">
+                    <button class="tab-btn active" data-urgency="" onclick="setTab(this, '')">
+                        <span>All Batches</span>
+                        <span class="tab-badge" id="tab-all-count">0</span>
+                    </button>
+                    <button class="tab-btn" data-urgency="urgent" onclick="setTab(this, 'urgent')">
+                        <span style="color:var(--critical);">●</span>
+                        <span>Urgent Priority</span>
+                        <span class="tab-badge" id="tab-urgent-count">0</span>
+                    </button>
+                    <button class="tab-btn" data-urgency="warning" onclick="setTab(this, 'warning')">
+                        <span style="color:var(--warning);">●</span>
+                        <span>Warning Window</span>
+                        <span class="tab-badge" id="tab-warning-count">0</span>
+                    </button>
+                    <button class="tab-btn" data-urgency="safe" onclick="setTab(this, 'safe')">
+                        <span style="color:var(--success);">●</span>
+                        <span>Safe Reserve</span>
+                        <span class="tab-badge" id="tab-safe-count">0</span>
+                    </button>
+                    <button class="tab-btn" data-urgency="expired" onclick="setTab(this, 'expired')">
+                        <span style="color:#64748B;">●</span>
+                        <span>Expired Stock</span>
+                        <span class="tab-badge" id="tab-expired-count">0</span>
+                    </button>
+                </div>
+
+                <!-- Expiry Table -->
+                <div class="data-table-container">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Batch #</th>
+                                    <th>Medicine Name</th>
+                                    <th>Location</th>
+                                    <th>Expiry Date</th>
+                                    <th>Days Left</th>
+                                    <th>On-Hand</th>
+                                    <th>Reserved</th>
+                                    <th>Available</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expiry-tbody">
+                                <tr><td colspan="10" class="text-center text-muted" style="padding:2rem;">Loading batch shelf-life data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal: Quarantine Batch -->
+    <div class="modal-backdrop" id="quarantine-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Quarantine Batch from Dispensing</h3>
+                <button class="modal-close-btn" onclick="App.closeModal('quarantine-modal')">&times;</button>
+            </div>
+            <form id="quarantine-form">
+                <input type="hidden" name="batch_id" id="quarantine-batch-id">
+                <div class="modal-body">
+                    <p class="text-sm text-secondary" style="margin-bottom:1rem;">
+                        Quarantine isolates batch units into locked storage and immediately stops all ward reservations.
+                    </p>
+                    <div class="form-group">
+                        <label class="form-label required">Quantity to Quarantine</label>
+                        <input class="form-input" type="number" name="quantity" id="quarantine-qty" min="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">Clinical Quarantine Reason</label>
+                        <select class="form-select" name="reason" required>
+                            <option value="Shelf-life expiration reached">Shelf-life expiration reached</option>
+                            <option value="Packaging breach or damaged container">Packaging breach or damaged container</option>
+                            <option value="Manufacturer batch recall advisory">Manufacturer batch recall advisory</option>
+                            <option value="Temperature excursion breach (cold chain)">Temperature excursion breach (cold chain)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="App.closeModal('quarantine-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-danger" id="quarantine-btn">Quarantine Immediately</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/navigation.js"></script>
+    <script>
+        let currentUrgency = '';
+        let expiryBatches = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Navigation.init('expiry');
+            
+            // Check query param e.g. /expiry.html?filter=urgent
+            const p = new URLSearchParams(window.location.search);
+            const filterParam = p.get('filter');
+            if (filterParam) {
+                currentUrgency = filterParam;
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    if (btn.dataset.urgency === filterParam) {
+                        document.querySelector('.tab-btn.active').classList.remove('active');
+                        btn.classList.add('active');
+                    }
+                });
+            }
+
+            await loadExpirySummary();
+            await loadExpiryList();
+
+            document.getElementById('quarantine-form').addEventListener('submit', handleQuarantine);
+        });
+
+        async function loadExpirySummary() {
+            try {
+                const res = await API.get('/expiry/summary');
+                if (res && res.data) {
+                    const s = res.data;
+                    document.getElementById('kpi-urgent-count').textContent = s.urgent_batches_count;
+                    document.getElementById('kpi-warning-count').textContent = s.warning_batches_count;
+                    document.getElementById('kpi-safe-count').textContent = s.safe_batches_count;
+                    document.getElementById('kpi-expired-count').textContent = s.expired_batches_count;
+
+                    const total = parseInt(s.urgent_batches_count) + parseInt(s.warning_batches_count) + parseInt(s.safe_batches_count) + parseInt(s.expired_batches_count);
+                    document.getElementById('tab-all-count').textContent = total;
+                    document.getElementById('tab-urgent-count').textContent = s.urgent_batches_count;
+                    document.getElementById('tab-warning-count').textContent = s.warning_batches_count;
+                    document.getElementById('tab-safe-count').textContent = s.safe_batches_count;
+                    document.getElementById('tab-expired-count').textContent = s.expired_batches_count;
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadExpiryList() {
+            const tbody = document.getElementById('expiry-tbody');
+            try {
+                const res = await API.get('/expiry', { urgency: currentUrgency });
+                if (!res || !res.data) return;
+                expiryBatches = res.data;
+
+                if (expiryBatches.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted" style="padding:2.5rem;">No batch consignments found in this expiry tier.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = expiryBatches.map(b => {
+                    const days = parseInt(b.days_remaining);
+                    const avail = Math.max(0, parseInt(b.current_quantity) - parseInt(b.reserved_quantity) - parseInt(b.quarantined_quantity));
+                    return `
+                        <tr>
+                            <td class="font-mono font-bold">${App.escapeHtml(b.batch_number)}</td>
+                            <td>
+                                <a href="/medicine-details.html?id=${b.medicine_id}" style="color:var(--primary); font-weight:600;">
+                                    ${App.escapeHtml(b.brand_name)}
+                                </a>
+                                <div class="text-muted text-xs">${App.escapeHtml(b.generic_name)} (${App.escapeHtml(b.strength)})</div>
+                            </td>
+                            <td>${App.escapeHtml(b.location_name)}</td>
+                            <td><strong>${App.formatDate(b.expiry_date)}</strong></td>
+                            <td class="font-mono">${days <= 0 ? '0d (Expired)' : `${days} days`}</td>
+                            <td><strong>${b.current_quantity}</strong></td>
+                            <td class="text-muted">${b.reserved_quantity}</td>
+                            <td><strong style="color:var(--primary);">${avail}</strong></td>
+                            <td>${App.renderUrgencyBadge(b.calculated_urgency, days)}</td>
+                            <td class="text-right" style="white-space:nowrap;">
+                                ${b.calculated_urgency === 'expired' || b.batch_status === 'expired' ? `
+                                    <a href="/disposal.html" class="btn btn-danger btn-sm">${App.icon('trash')} <span>Dispose</span></a>
+                                ` : `
+                                    <button class="btn btn-outline btn-sm" onclick="openQuarantineModal(${b.batch_id}, ${avail})">${App.icon('alertTriangle')} <span>Quarantine</span></button>
+                                    <a href="/transfers.html" class="btn btn-secondary btn-sm">${App.icon('swap')} <span>Transfer</span></a>
+                                `}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                App.toast('error', 'Failed to load expiry records');
+                console.error(err);
+            }
+        }
+
+        function setTab(btn, urgency) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentUrgency = urgency;
+            loadExpiryList();
+        }
+
+        function setUrgencyFilter(urgency) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.dataset.urgency === urgency) {
+                    setTab(btn, urgency);
+                }
+            });
+        }
+
+        function openQuarantineModal(batchId, availableQty) {
+            document.getElementById('quarantine-batch-id').value = batchId;
+            document.getElementById('quarantine-qty').value = availableQty > 0 ? availableQty : 1;
+            document.getElementById('quarantine-qty').max = availableQty > 0 ? availableQty : 1;
+            App.openModal('quarantine-modal');
+        }
+
+        async function handleQuarantine(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('quarantine-btn');
+
+            const payload = {
+                batch_id: parseInt(form.batch_id.value),
+                quantity: parseInt(form.quantity.value),
+                reason: form.reason.value
+            };
+
+            btn.disabled = true;
+            btn.textContent = 'Quarantining...';
+
+            try {
+                await API.post('/quarantine', payload);
+                App.toast('success', 'Batch units isolated and moved to quarantine locker');
+                App.closeModal('quarantine-modal');
+                await loadExpirySummary();
+                await loadExpiryList();
+            } catch (err) {
+                App.toast('error', err.message || 'Quarantine failed');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Quarantine Immediately';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,594 @@
+/* ==========================================================================
+   MedWaste Watch — Unified Multi-Tier Responsive Layout Engine
+   Tiers:
+   1. Ultra-Wide & 4K Displays (>= 1921px)
+   2. Large Desktop & 2K Monitors (1441px - 1920px)
+   3. Laptops & Standard Displays (1025px - 1440px)
+   4. Tablets & iPad Pro/Air/Mini (768px - 1024px)
+   5. Mobile Devices & Phablets (< 768px)
+   6. Compact Smartphones (< 480px)
+   7. Micro / Small Screens (< 360px)
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Shared Mobile & Tablet Drawer Overlay Backdrop
+   -------------------------------------------------------------------------- */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity var(--transition-fast), visibility var(--transition-fast);
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* --------------------------------------------------------------------------
+   Tier 1: Ultra-Wide & 4K Displays (>= 1921px)
+   -------------------------------------------------------------------------- */
+@media (min-width: 1921px) {
+    .content-container {
+        max-width: 2000px;
+        padding: 2.5rem 3.5rem;
+    }
+
+    .footer-content {
+        max-width: 2000px;
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 2rem;
+    }
+
+    .kpi-card {
+        padding: 1.75rem 1.5rem;
+    }
+
+    .kpi-value {
+        font-size: 2.25rem;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5rem;
+    }
+
+    .chart-container {
+        min-height: 340px;
+    }
+
+    .settings-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Tier 2: Large Desktop & 2K Monitors (1441px - 1920px)
+   -------------------------------------------------------------------------- */
+@media (min-width: 1441px) and (max-width: 1920px) {
+    .content-container {
+        max-width: 1680px;
+        padding: 2rem 2.5rem;
+    }
+
+    .footer-content {
+        max-width: 1680px;
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.5rem;
+    }
+
+    .kpi-card {
+        padding: 1.5rem 1.25rem;
+    }
+
+    .kpi-value {
+        font-size: 2rem;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+    }
+
+    .chart-container {
+        min-height: 290px;
+    }
+
+    .settings-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.75rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Tier 3: Laptops & Standard Desktop Displays (1025px - 1440px)
+   -------------------------------------------------------------------------- */
+@media (min-width: 1025px) and (max-width: 1440px) {
+    .content-container {
+        max-width: 1360px;
+        padding: 1.75rem 2rem;
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1.25rem;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .settings-grid {
+        grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Tier 4: Tablets & iPad Pro/Air/Mini (768px - 1024px)
+   -------------------------------------------------------------------------- */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* Drawer Navigation Mode on Tablets */
+    .app-sidebar {
+        transform: translateX(-100%);
+        width: 280px;
+        z-index: 1000;
+        box-shadow: 4px 0 25px rgba(0, 0, 0, 0.25);
+    }
+
+    .app-sidebar.open {
+        transform: translateX(0);
+    }
+
+    .sidebar-close-btn {
+        display: inline-flex !important;
+    }
+
+    .app-main {
+        margin-left: 0 !important;
+    }
+
+    .menu-toggle-btn {
+        display: inline-flex !important;
+    }
+
+    .content-container {
+        padding: 1.5rem 1.75rem;
+        max-width: 100%;
+    }
+
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.25rem;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .filter-bar {
+        gap: 1rem;
+    }
+
+    .search-input-wrapper {
+        flex: 1 1 240px;
+    }
+
+    .filter-controls {
+        flex-wrap: wrap;
+        gap: 0.65rem;
+    }
+
+    .form-row {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+
+    .settings-grid {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.25rem;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Tier 5: Mobile Devices & Phablets (< 768px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 767px) {
+    /* Mobile Off-Canvas Sidebar */
+    .app-sidebar {
+        transform: translateX(-100%);
+        width: 285px;
+        max-width: 85vw;
+        z-index: 1000;
+        transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .app-sidebar.open {
+        transform: translateX(0);
+        box-shadow: 6px 0 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .sidebar-close-btn {
+        display: inline-flex !important;
+    }
+
+    .app-main {
+        margin-left: 0 !important;
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Topbar Mobile Ergonomics */
+    .app-topbar {
+        height: 56px;
+        padding: 0 0.85rem;
+    }
+
+    .menu-toggle-btn {
+        display: inline-flex !important;
+        padding: 0.45rem;
+        border-radius: var(--radius-sm);
+    }
+
+    .topbar-left {
+        gap: 0.65rem;
+        min-width: 0;
+    }
+
+    .topbar-breadcrumbs {
+        gap: 0.35rem;
+        font-size: 0.8125rem;
+        max-width: 160px;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .breadcrumb-brand,
+    .breadcrumb-separator {
+        display: none !important;
+    }
+
+    .topbar-breadcrumbs span.active {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .topbar-right {
+        gap: 0.35rem;
+    }
+
+    .topbar-dept-badge {
+        display: none !important;
+    }
+
+    .topbar-logout-text {
+        display: none !important;
+    }
+
+    .topbar-logout-btn {
+        padding: 0.45rem !important;
+    }
+
+    /* Mobile Page Shell & Spacing */
+    .content-container {
+        padding: 1rem 0.85rem;
+        width: 100%;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .page-title-group h1 {
+        font-size: 1.25rem;
+        word-break: break-word;
+    }
+
+    .page-title-group p {
+        font-size: 0.8125rem;
+    }
+
+    .page-actions {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .page-actions .btn,
+    .page-actions a {
+        flex: 1 1 calc(50% - 0.25rem);
+        justify-content: center;
+        text-align: center;
+        padding: 0.55rem 0.75rem;
+        font-size: 0.8125rem;
+        white-space: nowrap;
+    }
+
+    /* KPI Metrics Grid */
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .kpi-card {
+        padding: 0.85rem;
+    }
+
+    .kpi-value {
+        font-size: 1.45rem;
+    }
+
+    .kpi-label {
+        font-size: 0.70rem;
+    }
+
+    .kpi-icon-box {
+        width: 38px;
+        height: 38px;
+    }
+
+    /* Search and Filter Bar */
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+        padding: 0.85rem;
+    }
+
+    .search-input-wrapper {
+        width: 100%;
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+
+    .filter-controls {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .filter-controls .form-select,
+    .filter-controls select {
+        flex: 1 1 calc(50% - 0.25rem);
+        min-width: 125px;
+        font-size: 0.8125rem;
+        padding: 0.5rem 0.65rem;
+    }
+
+    .filter-controls .btn {
+        flex: 1 1 auto;
+        justify-content: center;
+        padding: 0.5rem 0.85rem;
+    }
+
+    /* Dashboard Grid & Analytics */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .chart-container {
+        min-height: 220px;
+    }
+
+    .expiry-legend-grid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+
+    /* Clinical Tables & Horizontal Scroll */
+    .data-table-container {
+        margin-bottom: 1.25rem;
+        border-radius: var(--radius-sm);
+    }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 0.65rem 0.75rem;
+        font-size: 0.8125rem;
+        white-space: nowrap;
+    }
+
+    /* Pagination Mobile Stack */
+    .pagination-wrapper {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        text-align: center;
+    }
+
+    .pagination-pages {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.25rem;
+    }
+
+    .page-btn {
+        min-width: 32px;
+        height: 32px;
+        font-size: 0.8125rem;
+    }
+
+    /* Modals & Dialogs */
+    .modal-dialog {
+        width: calc(100% - 1.25rem);
+        margin: 0.625rem auto;
+        max-height: calc(100vh - 1.25rem);
+    }
+
+    .modal-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .modal-body {
+        padding: 1rem 1.25rem;
+        max-height: calc(100vh - 160px);
+        overflow-y: auto;
+    }
+
+    .modal-footer {
+        padding: 0.85rem 1.25rem;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .modal-footer .btn {
+        flex: 1 1 calc(50% - 0.25rem);
+        justify-content: center;
+    }
+
+    /* Forms */
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+        font-size: 16px; /* Prevents auto-zoom on iOS Safari */
+    }
+
+    .settings-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .specs-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 0.85rem !important;
+    }
+
+    /* Mobile Footer */
+    .app-footer {
+        padding: 1rem 0.85rem;
+    }
+
+    .footer-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .footer-links {
+        gap: 0.5rem 0.85rem;
+        flex-wrap: wrap;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Tier 6: Compact Smartphones (< 480px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+    .content-container {
+        padding: 0.85rem 0.65rem;
+    }
+
+    .topbar-breadcrumbs {
+        max-width: 130px;
+    }
+
+    .page-actions .btn,
+    .page-actions a {
+        flex: 1 1 100%;
+    }
+
+    .kpi-grid {
+        grid-template-columns: 1fr;
+        gap: 0.65rem;
+    }
+
+    .filter-controls .form-select,
+    .filter-controls select {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+
+    .filter-controls .btn {
+        flex: 1 1 100%;
+    }
+
+    .specs-grid {
+        grid-template-columns: 1fr !important;
+        gap: 0.75rem !important;
+    }
+
+    .theme-selector-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .modal-footer .btn {
+        flex: 1 1 100%;
+    }
+
+    .toast {
+        min-width: 260px;
+        max-width: calc(100vw - 1.5rem);
+    }
+}
+
+/* --------------------------------------------------------------------------
+   Tier 7: Micro / Small Screens (< 360px)
+   -------------------------------------------------------------------------- */
+@media (max-width: 360px) {
+    .app-sidebar {
+        width: 255px;
+        max-width: 90vw;
+    }
+
+    .topbar-breadcrumbs {
+        max-width: 95px;
+    }
+
+    .kpi-card {
+        padding: 0.75rem;
+    }
+
+    .kpi-value {
+        font-size: 1.35rem;
+    }
+
+    .kpi-icon-box {
+        width: 34px;
+        height: 34px;
+    }
+}

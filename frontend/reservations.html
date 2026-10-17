@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department Medicine Reservations — MedWaste Watch</title>
+    <link rel="stylesheet" href="/assets/css/variables.css">
+    <link rel="stylesheet" href="/assets/css/reset.css">
+    <link rel="stylesheet" href="/assets/css/typography.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/forms.css">
+    <link rel="stylesheet" href="/assets/css/tables.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <script src="/assets/js/theme.js"></script>
+    <style>
+        .tabs-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all var(--transition-fast);
+        }
+
+        .tab-btn:hover {
+            background-color: var(--bg-surface-secondary);
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-light);
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="app-main">
+            <div id="topbar-container"></div>
+
+            <main class="content-container">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
+                            <span>Department Stock Reservation Requests</span>
+                        </h1>
+                        <p>Submit clinical ward requests, process FEFO batch allocations, and dispense reserved medication units.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="openNewRequestModal()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            <span>Submit Ward Request</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabs Filter -->
+                <div class="tabs-nav">
+                    <button class="tab-btn active" data-status="" onclick="setTab(this, '')">All Requests</button>
+                    <button class="tab-btn" data-status="pending" onclick="setTab(this, 'pending')">Pending Review</button>
+                    <button class="tab-btn" data-status="approved" onclick="setTab(this, 'approved')">Ready for Pickup</button>
+                    <button class="tab-btn" data-status="issued" onclick="setTab(this, 'issued')">Dispensed</button>
+                    <button class="tab-btn" data-status="rejected" onclick="setTab(this, 'rejected')">Rejected</button>
+                    <button class="tab-btn" data-status="cancelled" onclick="setTab(this, 'cancelled')">Cancelled</button>
+                </div>
+
+                <!-- Table -->
+                <div class="data-table-container">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Request #</th>
+                                    <th>Department</th>
+                                    <th>Medicine Name</th>
+                                    <th>Requested</th>
+                                    <th>Approved</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Request Date</th>
+                                    <th>Expiry Window</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="reservations-tbody">
+                                <tr><td colspan="10" class="text-center text-muted" style="padding:2.5rem;">Loading reservation queue...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal: Submit Ward Request -->
+    <div class="modal-backdrop" id="new-request-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Submit Department Medicine Request</h3>
+                <button class="modal-close-btn" onclick="App.closeModal('new-request-modal')">&times;</button>
+            </div>
+            <form id="new-request-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label required">Target Medicine</label>
+                        <select class="form-select" name="medicine_id" id="modal-req-med" required>
+                            <option value="">Select Medicine...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Requesting Department</label>
+                            <select class="form-select" name="department_id" id="modal-req-dept" required>
+                                <option value="">Select Department...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Units Requested</label>
+                            <input class="form-input" type="number" name="requested_quantity" min="1" placeholder="e.g. 5" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Priority Level</label>
+                        <select class="form-select" name="priority" required>
+                            <option value="routine">Routine (Scheduled Ward Resupply)</option>
+                            <option value="urgent">Urgent (Trauma / Acute Stabilization)</option>
+                            <option value="stat">STAT (Immediate Code / Life-Threatening Emergency)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Clinical / Operational Justification</label>
+                        <textarea class="form-textarea" name="justification" placeholder="Specify clinical indication, patient ID or trauma ward replenishment need..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="App.closeModal('new-request-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-req">Submit Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Pharmacist Approve / Allocate FEFO -->
+    <div class="modal-backdrop" id="approve-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Pharmacist FEFO Approval & Batch Allocation</h3>
+                <button class="modal-close-btn" onclick="App.closeModal('approve-modal')">&times;</button>
+            </div>
+            <form id="approve-form">
+                <input type="hidden" name="reservation_id" id="app-res-id">
+                <div class="modal-body">
+                    <p class="text-sm text-secondary" style="margin-bottom:1rem;">
+                        Allocating batches automatically using strict <strong>First Expired, First Out (FEFO)</strong> sequence.
+                    </p>
+                    <div class="form-group">
+                        <label class="form-label">Request Identifier</label>
+                        <input class="form-input font-mono" type="text" id="app-req-num" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Medicine</label>
+                        <input class="form-input" type="text" id="app-med-name" disabled>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Requested Quantity</label>
+                            <input class="form-input" type="text" id="app-req-qty" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Approved Quantity</label>
+                            <input class="form-input" type="number" name="approved_quantity" id="app-approved-qty" min="1" required>
+                            <div class="form-hint">Partial approvals will lock only approved units</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="App.closeModal('approve-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-confirm-approve">Confirm FEFO Allocation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Pharmacist Reject -->
+    <div class="modal-backdrop" id="reject-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Reject Reservation Request</h3>
+                <button class="modal-close-btn" onclick="App.closeModal('reject-modal')">&times;</button>
+            </div>
+            <form id="reject-form">
+                <input type="hidden" name="reservation_id" id="rej-res-id">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label required">Mandatory Clinical / Operational Reason</label>
+                        <textarea class="form-textarea" name="reason" placeholder="e.g. Ineligible indication, non-standard ward quota, therapeutic substitution recommended..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="App.closeModal('reject-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-danger" id="btn-confirm-reject">Reject Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/navigation.js"></script>
+    <script>
+        let currentStatusFilter = '';
+        let reservationsList = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Navigation.init('reservations');
+            await loadDropdowns();
+            await loadReservations();
+
+            // Check URL param e.g. /reservations.html?medicine_id=1
+            const p = new URLSearchParams(window.location.search);
+            const medId = p.get('medicine_id');
+            if (medId) {
+                openNewRequestModal();
+                document.getElementById('modal-req-med').value = medId;
+            }
+
+            document.getElementById('new-request-form').addEventListener('submit', handleNewRequest);
+            document.getElementById('approve-form').addEventListener('submit', handleApproveRequest);
+            document.getElementById('reject-form').addEventListener('submit', handleRejectRequest);
+        });
+
+        async function loadDropdowns() {
+            try {
+                // Medicines
+                const medRes = await API.get('/medicines', { limit: 100 });
+                if (medRes && medRes.data && medRes.data.items) {
+                    const sel = document.getElementById('modal-req-med');
+                    medRes.data.items.forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value = m.id;
+                        opt.textContent = `${m.brand_name} (${m.strength}) — Avail: ${m.available_to_reserve} ${m.unit_of_measure}`;
+                        sel.appendChild(opt);
+                    });
+                }
+
+                // Departments
+                const deptRes = await API.get('/departments');
+                if (deptRes && deptRes.data) {
+                    const sel = document.getElementById('modal-req-dept');
+                    deptRes.data.forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d.id;
+                        opt.textContent = `${d.name} (${d.code})`;
+                        sel.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadReservations() {
+            const tbody = document.getElementById('reservations-tbody');
+            try {
+                const res = await API.get('/reservations', { status: currentStatusFilter });
+                if (!res || !res.data) return;
+                reservationsList = res.data;
+
+                if (reservationsList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted" style="padding:2.5rem;">No reservation requests found.</td></tr>`;
+                    return;
+                }
+
+                const user = Auth.getUser();
+                const isPharmacist = Auth.hasRole('pharmacist', 'super_admin');
+
+                tbody.innerHTML = reservationsList.map(r => {
+                    let priorityBadge = '<span class="badge badge-neutral">Routine</span>';
+                    if (r.priority === 'stat') {
+                        priorityBadge = '<span class="badge badge-urgent"><span class="badge-dot"></span>STAT</span>';
+                    } else if (r.priority === 'urgent') {
+                        priorityBadge = '<span class="badge badge-warning"><span class="badge-dot"></span>Urgent</span>';
+                    }
+
+                    return `
+                        <tr>
+                            <td class="font-mono font-bold">${App.escapeHtml(r.request_number)}</td>
+                            <td>${App.escapeHtml(r.department_name)}</td>
+                            <td>
+                                <strong>${App.escapeHtml(r.brand_name)}</strong>
+                                <div class="text-muted text-xs">${App.escapeHtml(r.justification || 'Routine ward allocation')}</div>
+                            </td>
+                            <td><strong>${r.requested_quantity}</strong></td>
+                            <td>${r.approved_quantity > 0 ? `<strong style="color:var(--success);">${r.approved_quantity}</strong>` : '—'}</td>
+                            <td>${priorityBadge}</td>
+                            <td>${App.renderReservationBadge(r.status)}</td>
+                            <td class="text-muted text-xs">${App.formatDateTime(r.created_at)}</td>
+                            <td class="text-muted text-xs">${r.expires_at ? App.formatDateTime(r.expires_at) : '—'}</td>
+                            <td class="text-right" style="white-space:nowrap;">
+                                ${r.status === 'pending' && isPharmacist ? `
+                                    <button class="btn btn-primary btn-sm" onclick="openApproveModal(${r.id})">${App.icon('check')} <span>Approve</span></button>
+                                    <button class="btn btn-danger btn-sm" onclick="openRejectModal(${r.id})">${App.icon('x')} <span>Reject</span></button>
+                                ` : ''}
+
+                                ${(r.status === 'approved' || r.status === 'partially_approved') && isPharmacist ? `
+                                    <button class="btn btn-success btn-sm" onclick="issueStock(${r.id})">${App.icon('package')} <span>Dispense</span></button>
+                                ` : ''}
+
+                                ${['pending', 'approved', 'partially_approved'].includes(r.status) ? `
+                                    <button class="btn btn-secondary btn-sm" onclick="cancelReservation(${r.id})">${App.icon('x')} <span>Cancel</span></button>
+                                ` : ''}
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                App.toast('error', 'Failed to load reservations.');
+                console.error(err);
+            }
+        }
+
+        function setTab(btn, status) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentStatusFilter = status;
+            loadReservations();
+        }
+
+        function openNewRequestModal() {
+            document.getElementById('new-request-form').reset();
+            const u = Auth.getUser();
+            if (u && u.department_id) {
+                document.getElementById('modal-req-dept').value = u.department_id;
+            }
+            App.openModal('new-request-modal');
+        }
+
+        async function handleNewRequest(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('btn-submit-req');
+
+            const payload = {
+                medicine_id: parseInt(form.medicine_id.value),
+                department_id: parseInt(form.department_id.value),
+                requested_quantity: parseInt(form.requested_quantity.value),
+                priority: form.priority.value,
+                justification: form.justification.value.trim()
+            };
+
+            btn.disabled = true;
+            btn.textContent = 'Submitting...';
+
+            try {
+                const res = await API.post('/reservations', payload);
+                App.toast('success', `Reservation request ${res.data.request_number} submitted to Central Pharmacy`);
+                App.closeModal('new-request-modal');
+                await loadReservations();
+            } catch (err) {
+                App.toast('error', err.message || 'Submission failed');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Submit Request';
+            }
+        }
+
+        function openApproveModal(id) {
+            const r = reservationsList.find(x => x.id == id);
+            if (!r) return;
+
+            document.getElementById('app-res-id').value = r.id;
+            document.getElementById('app-req-num').value = r.request_number;
+            document.getElementById('app-med-name').value = `${r.brand_name} (${r.department_name})`;
+            document.getElementById('app-req-qty').value = `${r.requested_quantity} units`;
+            document.getElementById('app-approved-qty').value = r.requested_quantity;
+            document.getElementById('app-approved-qty').max = r.requested_quantity;
+            App.openModal('approve-modal');
+        }
+
+        async function handleApproveRequest(e) {
+            e.preventDefault();
+            const form = e.target;
+            const id = form.reservation_id.value;
+            const btn = document.getElementById('btn-confirm-approve');
+
+            btn.disabled = true;
+            btn.textContent = 'Allocating FEFO batches...';
+
+            try {
+                const payload = { approved_quantity: parseInt(form.approved_quantity.value) };
+                await API.post(`/reservations/${id}/approve`, payload);
+                App.toast('success', 'Reservation approved and batches locked successfully');
+                App.closeModal('approve-modal');
+                await loadReservations();
+            } catch (err) {
+                App.toast('error', err.message || 'Approval failed');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Confirm FEFO Allocation';
+            }
+        }
+
+        function openRejectModal(id) {
+            document.getElementById('rej-res-id').value = id;
+            document.getElementById('reject-form').reset();
+            App.openModal('reject-modal');
+        }
+
+        async function handleRejectRequest(e) {
+            e.preventDefault();
+            const form = e.target;
+            const id = form.reservation_id.value;
+            const btn = document.getElementById('btn-confirm-reject');
+
+            btn.disabled = true;
+            btn.textContent = 'Rejecting...';
+
+            try {
+                await API.post(`/reservations/${id}/reject`, { reason: form.reason.value.trim() });
+                App.toast('info', 'Reservation rejected');
+                App.closeModal('reject-modal');
+                await loadReservations();
+            } catch (err) {
+                App.toast('error', err.message || 'Rejection failed');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Reject Request';
+            }
+        }
+
+        async function issueStock(id) {
+            if (!confirm('Confirm physical dispensing of reserved units to department? This will deduct the physical inventory ledger.')) {
+                return;
+            }
+
+            try {
+                await API.post(`/reservations/${id}/issue`);
+                App.toast('success', 'Medication issued and physical inventory deducted successfully');
+                await loadReservations();
+            } catch (err) {
+                App.toast('error', err.message || 'Dispensing failed');
+            }
+        }
+
+        async function cancelReservation(id) {
+            const reason = prompt('Please enter cancellation reason:');
+            if (reason === null) return;
+
+            try {
+                await API.post(`/reservations/${id}/cancel`, { reason });
+                App.toast('info', 'Reservation cancelled and reserved stock released');
+                await loadReservations();
+            } catch (err) {
+                App.toast('error', err.message || 'Cancellation failed');
+            }
+        }
+    </script>
+</body>
+</html>

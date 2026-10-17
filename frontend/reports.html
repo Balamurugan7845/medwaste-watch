@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports & Compliance Analytics — MedWaste Watch</title>
+    <link rel="stylesheet" href="/assets/css/variables.css">
+    <link rel="stylesheet" href="/assets/css/reset.css">
+    <link rel="stylesheet" href="/assets/css/typography.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/forms.css">
+    <link rel="stylesheet" href="/assets/css/tables.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <script src="/assets/js/theme.js"></script>
+    <style>
+        @media print {
+            .app-sidebar, .app-topbar, .page-actions, .filter-bar, .tabs-nav {
+                display: none !important;
+            }
+            .app-main {
+                margin-left: 0 !important;
+            }
+            .content-container {
+                padding: 0 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="app-main">
+            <div id="topbar-container"></div>
+
+            <main class="content-container">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+                            <span>Reports & Inventory Analytics</span>
+                        </h1>
+                        <p>Generate auditable hospital stock reports, batch expiry ledgers, and export CSVs with formula-injection security.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-secondary" onclick="window.print()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect width="12" height="8" x="6" y="14"/></svg>
+                            <span>Print Report</span>
+                        </button>
+                        <button class="btn btn-primary" onclick="exportCurrentReportCsv()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                            <span>Export Safe CSV</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Report Type Switcher Filter Bar -->
+                <div class="filter-bar">
+                    <div class="filter-controls" style="flex:1;">
+                        <label class="form-label font-bold" style="margin-right:0.5rem; align-self:center;">Report View:</label>
+                        <select id="report-type-select" class="form-select" style="min-width: 260px;">
+                            <option value="current_stock">Current Stock & Availability Summary</option>
+                            <option value="batch_wise">Batch-Wise Shelf-Life & Valuation Report</option>
+                            <option value="wastage">Approved Disposal & Loss Wastage Report</option>
+                            <option value="movements">Stock Movements & Transaction Audit Trail</option>
+                        </select>
+                        <button class="btn btn-secondary btn-sm" onclick="loadReport()">Refresh Data</button>
+                    </div>
+                </div>
+
+                <!-- Dynamic Report Table -->
+                <div class="data-table-container">
+                    <div class="table-responsive">
+                        <table class="data-table" id="report-table">
+                            <thead id="report-thead"></thead>
+                            <tbody id="report-tbody">
+                                <tr><td class="text-center text-muted" style="padding:2.5rem;">Loading report...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Navigation.init('reports');
+
+            // Handle query param e.g. /reports.html?type=movements
+            const p = new URLSearchParams(window.location.search);
+            const reqType = p.get('type');
+            if (reqType) {
+                document.getElementById('report-type-select').value = reqType;
+            }
+
+            document.getElementById('report-type-select').addEventListener('change', loadReport);
+            await loadReport();
+        });
+
+        async function loadReport() {
+            const type = document.getElementById('report-type-select').value;
+            const thead = document.getElementById('report-thead');
+            const tbody = document.getElementById('report-tbody');
+
+            tbody.innerHTML = `<tr><td class="text-center text-muted" style="padding:2rem;">Generating live ${type} report...</td></tr>`;
+
+            try {
+                const res = await API.get('/reports', { type });
+                if (!res || !res.data) return;
+                const items = res.data.items || [];
+
+                if (items.length === 0) {
+                    thead.innerHTML = '';
+                    tbody.innerHTML = `<tr><td class="text-center text-muted" style="padding:2.5rem;">No records found for this report criteria.</td></tr>`;
+                    return;
+                }
+
+                if (type === 'current_stock') {
+                    thead.innerHTML = `
+                        <tr>
+                            <th>SKU</th>
+                            <th>Brand Name</th>
+                            <th>Generic Name</th>
+                            <th>Category</th>
+                            <th>Strength & Form</th>
+                            <th>On-Hand</th>
+                            <th>Reserved</th>
+                            <th>Quarantined</th>
+                            <th>Available to Reserve</th>
+                            <th>Reorder Level</th>
+                        </tr>
+                    `;
+                    tbody.innerHTML = items.map(m => `
+                        <tr>
+                            <td class="font-mono text-sm">${App.escapeHtml(m.sku)}</td>
+                            <td><strong>${App.escapeHtml(m.brand_name)}</strong></td>
+                            <td class="text-muted text-xs">${App.escapeHtml(m.generic_name)}</td>
+                            <td class="text-muted">${App.escapeHtml(m.category)}</td>
+                            <td>${App.escapeHtml(m.strength)} (${App.escapeHtml(m.dosage_form)})</td>
+                            <td><strong>${m.on_hand_quantity}</strong></td>
+                            <td class="text-muted">${m.reserved_quantity}</td>
+                            <td style="color:${m.quarantined_quantity > 0 ? 'var(--critical)' : 'inherit'};">${m.quarantined_quantity}</td>
+                            <td><strong style="color:var(--primary);">${m.available_quantity}</strong> ${App.escapeHtml(m.unit_of_measure)}</td>
+                            <td class="text-muted">${m.reorder_level}</td>
+                        </tr>
+                    `).join('');
+
+                } else if (type === 'batch_wise') {
+                    thead.innerHTML = `
+                        <tr>
+                            <th>Batch #</th>
+                            <th>Medicine</th>
+                            <th>Location</th>
+                            <th>Expiry Date</th>
+                            <th>Days Remaining</th>
+                            <th>Current Units</th>
+                            <th>Reserved</th>
+                            <th>Unit Cost</th>
+                            <th>Total Valuation</th>
+                            <th>Status</th>
+                        </tr>
+                    `;
+                    tbody.innerHTML = items.map(b => `
+                        <tr>
+                            <td class="font-mono font-bold">${App.escapeHtml(b.batch_number)}</td>
+                            <td>
+                                <strong>${App.escapeHtml(b.brand_name)}</strong>
+                                <div class="text-muted text-xs">${App.escapeHtml(b.generic_name)}</div>
+                            </td>
+                            <td>${App.escapeHtml(b.location)}</td>
+                            <td><strong>${App.formatDate(b.expiry_date)}</strong></td>
+                            <td class="font-mono">${b.days_to_expiry}d</td>
+                            <td><strong>${b.current_quantity}</strong></td>
+                            <td class="text-muted">${b.reserved_quantity}</td>
+                            <td class="text-muted">${App.formatCurrency(b.unit_cost)}</td>
+                            <td style="font-weight:700;">${App.formatCurrency(b.total_valuation)}</td>
+                            <td><span class="badge badge-neutral">${App.escapeHtml(b.batch_status)}</span></td>
+                        </tr>
+                    `).join('');
+
+                } else if (type === 'wastage') {
+                    thead.innerHTML = `
+                        <tr>
+                            <th>Disposal Ref</th>
+                            <th>Date</th>
+                            <th>Medicine</th>
+                            <th>Batch #</th>
+                            <th>Destroyed Qty</th>
+                            <th>Loss Value</th>
+                            <th>Method</th>
+                            <th>Reason</th>
+                            <th>Authorized By</th>
+                            <th>Cert Ref</th>
+                        </tr>
+                    `;
+                    tbody.innerHTML = items.map(d => `
+                        <tr>
+                            <td class="font-mono font-bold">${App.escapeHtml(d.disposal_number)}</td>
+                            <td class="text-muted text-xs">${App.formatDateTime(d.disposed_at)}</td>
+                            <td><strong>${App.escapeHtml(d.brand_name)}</strong></td>
+                            <td class="font-mono text-xs">${App.escapeHtml(d.batch_number)}</td>
+                            <td><strong style="color:var(--critical);">${d.quantity}</strong></td>
+                            <td style="font-weight:700;">${App.formatCurrency(d.estimated_loss_value)}</td>
+                            <td><span class="badge badge-neutral">${App.escapeHtml(d.disposal_method.replace('_', ' '))}</span></td>
+                            <td><span class="badge badge-urgent">${App.escapeHtml(d.reason)}</span></td>
+                            <td class="text-muted text-xs">${App.escapeHtml(d.authorized_by)}</td>
+                            <td class="font-mono text-xs">${App.escapeHtml(d.certificate_ref || '—')}</td>
+                        </tr>
+                    `).join('');
+
+                } else if (type === 'movements') {
+                    thead.innerHTML = `
+                        <tr>
+                            <th>Movement ID</th>
+                            <th>Timestamp</th>
+                            <th>Medicine</th>
+                            <th>Batch #</th>
+                            <th>Type</th>
+                            <th>Quantity</th>
+                            <th>Balance Before</th>
+                            <th>Balance After</th>
+                            <th>Reason / Reference</th>
+                            <th>Officer</th>
+                        </tr>
+                    `;
+                    tbody.innerHTML = items.map(sm => {
+                        const isPositive = parseInt(sm.quantity) > 0;
+                        const prefix = isPositive ? '+' : '';
+                        const color = isPositive ? 'var(--success)' : 'var(--critical)';
+                        return `
+                            <tr>
+                                <td class="font-mono text-xs">#${sm.id}</td>
+                                <td class="text-muted text-xs">${App.formatDateTime(sm.created_at)}</td>
+                                <td><strong>${App.escapeHtml(sm.brand_name)}</strong></td>
+                                <td class="font-mono text-xs">${App.escapeHtml(sm.batch_number)}</td>
+                                <td><span class="badge badge-neutral">${App.escapeHtml(sm.movement_type)}</span></td>
+                                <td style="font-weight:700; color:${color};">${prefix}${sm.quantity}</td>
+                                <td class="text-muted">${sm.balance_before}</td>
+                                <td><strong>${sm.balance_after}</strong></td>
+                                <td class="text-secondary text-xs">${App.escapeHtml(sm.reason || '—')}</td>
+                                <td class="text-muted text-xs">${App.escapeHtml(sm.performed_by || 'System')}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                App.toast('error', 'Failed to generate report');
+                console.error(err);
+            }
+        }
+
+        async function exportCurrentReportCsv() {
+            const type = document.getElementById('report-type-select').value;
+            try {
+                const blob = await API.request(`/reports/export?type=${type}`, { method: 'GET' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `medwaste_${type}_${new Date().toISOString().slice(0, 10)}.csv`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+                App.toast('success', 'Protected CSV exported successfully');
+            } catch (err) {
+                App.toast('error', 'CSV export failed');
+                console.error(err);
+            }
+        }
+    </script>
+</body>
+</html>

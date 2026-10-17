@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Immutable Compliance Audit Logs — MedWaste Watch</title>
+    <link rel="stylesheet" href="/assets/css/variables.css">
+    <link rel="stylesheet" href="/assets/css/reset.css">
+    <link rel="stylesheet" href="/assets/css/typography.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/forms.css">
+    <link rel="stylesheet" href="/assets/css/tables.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <script src="/assets/js/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="app-main">
+            <div id="topbar-container"></div>
+
+            <main class="content-container">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                            <span>Compliance Security & Operational Audit Trail</span>
+                        </h1>
+                        <p>Immutable forensic record of all user logins, batch receipts, stock adjustments, and clinical approvals.</p>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <div class="search-input-wrapper">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <input type="text" id="action-filter" class="search-input" placeholder="Search by action name (e.g. RESERVATION, STOCK_ADJUSTMENT, LOGIN)...">
+                    </div>
+                    <div class="filter-controls">
+                        <select id="entity-filter" class="form-select" style="min-width: 180px;">
+                            <option value="">All Entity Types</option>
+                            <option value="User">User</option>
+                            <option value="Medicine">Medicine</option>
+                            <option value="MedicineBatch">Medicine Batch</option>
+                            <option value="Reservation">Reservation</option>
+                            <option value="Transfer">Transfer</option>
+                            <option value="DisposalRecord">Disposal Record</option>
+                            <option value="SystemSettings">System Settings</option>
+                        </select>
+                        <button class="btn btn-secondary btn-sm" onclick="resetFilters()">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Audit Logs Table -->
+                <div class="data-table-container">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Audit ID</th>
+                                    <th>Timestamp</th>
+                                    <th>Actor / User</th>
+                                    <th>Action Performed</th>
+                                    <th>Entity</th>
+                                    <th>Entity ID</th>
+                                    <th>Old State</th>
+                                    <th>New State</th>
+                                    <th>Client IP</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-tbody">
+                                <tr><td colspan="9" class="text-center text-muted" style="padding:2.5rem;">Loading audit records...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Navigation.init('audit-logs');
+            if (!Auth.hasRole('super_admin', 'auditor')) {
+                App.toast('error', 'Access restricted to auditors and administrators.');
+                window.location.replace('/dashboard.html');
+                return;
+            }
+            await loadAuditLogs();
+
+            document.getElementById('action-filter').addEventListener('input', App.debounce(loadAuditLogs, 300));
+            document.getElementById('entity-filter').addEventListener('change', loadAuditLogs);
+        });
+
+        async function loadAuditLogs() {
+            const tbody = document.getElementById('audit-tbody');
+            const action = document.getElementById('action-filter').value.trim();
+            const entityType = document.getElementById('entity-filter').value;
+
+            try {
+                const res = await API.get('/audit-logs', { action, entity_type: entityType, limit: 100 });
+                if (!res || !res.data) return;
+
+                if (res.data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="9" class="text-center text-muted" style="padding:2.5rem;">No matching audit logs found.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = res.data.map(al => {
+                    let oldStr = '—';
+                    let newStr = '—';
+                    try {
+                        if (al.old_values) oldStr = JSON.stringify(JSON.parse(al.old_values));
+                    } catch (e) { oldStr = al.old_values; }
+
+                    try {
+                        if (al.new_values) newStr = JSON.stringify(JSON.parse(al.new_values));
+                    } catch (e) { newStr = al.new_values; }
+
+                    return `
+                        <tr>
+                            <td class="font-mono text-xs">#${al.id}</td>
+                            <td class="text-muted text-xs">${App.formatDateTime(al.created_at)}</td>
+                            <td>
+                                <strong>${App.escapeHtml(al.user_full_name || 'System')}</strong>
+                                <div class="text-muted text-xs font-mono">${App.escapeHtml(al.username || 'system')}</div>
+                            </td>
+                            <td><span class="badge badge-info" style="font-mono font-size:0.75rem;">${App.escapeHtml(al.action)}</span></td>
+                            <td><span class="badge badge-neutral">${App.escapeHtml(al.entity_type)}</span></td>
+                            <td class="font-mono text-xs">${al.entity_id || '—'}</td>
+                            <td class="font-mono text-xs text-muted" style="max-width:180px; overflow:hidden; text-overflow:ellipsis;" title="${App.escapeHtml(oldStr)}">${App.escapeHtml(oldStr)}</td>
+                            <td class="font-mono text-xs text-secondary" style="max-width:200px; overflow:hidden; text-overflow:ellipsis;" title="${App.escapeHtml(newStr)}">${App.escapeHtml(newStr)}</td>
+                            <td class="font-mono text-xs text-muted">${App.escapeHtml(al.ip_address || '—')}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } catch (err) {
+                App.toast('error', 'Failed to load audit logs');
+                console.error(err);
+            }
+        }
+
+        function resetFilters() {
+            document.getElementById('action-filter').value = '';
+            document.getElementById('entity-filter').value = '';
+            loadAuditLogs();
+        }
+    </script>
+</body>
+</html>

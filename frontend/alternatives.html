@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clinical Alternatives Discovery — MedWaste Watch</title>
+    <link rel="stylesheet" href="/assets/css/variables.css">
+    <link rel="stylesheet" href="/assets/css/reset.css">
+    <link rel="stylesheet" href="/assets/css/typography.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/forms.css">
+    <link rel="stylesheet" href="/assets/css/tables.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <script src="/assets/js/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="app-main">
+            <div id="topbar-container"></div>
+
+            <main class="content-container">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+                            <span>Clinical Alternative Medicine Availability</span>
+                        </h1>
+                        <p>Discover therapeutically equivalent substitutions for unavailable or depleted medicines, backed by physician approval workflows.</p>
+                    </div>
+                </div>
+
+                <!-- Medicine Selector -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <div class="form-row" style="align-items:flex-end;">
+                        <div class="form-group" style="flex:2; margin-bottom:0;">
+                            <label class="form-label font-bold">Select Requested Medicine to Inspect Alternatives</label>
+                            <select id="medicine-select" class="form-select">
+                                <option value="">Select a medicine from hospital formulary...</option>
+                            </select>
+                        </div>
+                        <div style="flex:1;">
+                            <button class="btn btn-primary" onclick="lookupAlternatives()" style="width:100%;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                                <span>Inspect Alternatives</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Primary Medicine Availability Header -->
+                <div id="primary-medicine-card" style="display:none; margin-bottom: 1.75rem;">
+                    <div class="card" style="border-left: 4px solid var(--primary);">
+                        <div class="card-header">
+                            <div>
+                                <span class="badge badge-neutral" style="margin-bottom:0.35rem;">Requested Primary Medicine</span>
+                                <h2 class="card-title" id="prim-brand-name">—</h2>
+                                <div class="text-muted text-sm" id="prim-generic-name">—</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div class="text-xs text-muted uppercase font-bold">Available-to-Reserve</div>
+                                <div class="text-2xl font-bold" id="prim-available" style="color:var(--primary);">0</div>
+                                <div class="text-xs text-muted" id="prim-on-hand">Physical on-hand: 0</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:1.5rem; flex-wrap:wrap; font-size:0.875rem;">
+                            <div><span class="text-muted">Strength:</span> <strong id="prim-strength">—</strong></div>
+                            <div><span class="text-muted">Form:</span> <strong id="prim-form">—</strong></div>
+                            <div><span class="text-muted">Category:</span> <strong id="prim-category">—</strong></div>
+                            <div><span class="text-muted">Reorder Threshold:</span> <strong id="prim-reorder">—</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clinical Alternatives List -->
+                <div id="alternatives-results-container">
+                    <div class="card">
+                        <div class="empty-state">
+                            <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                            <div class="empty-state-title">Select a Medicine to Inspect Alternatives</div>
+                            <div class="empty-state-text">Choose a medicine above to check verified therapeutic equivalence, live batch availability, and initiate substitution sign-off.</div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal: Doctor Substitution Sign-Off -->
+    <div class="modal-backdrop" id="substitution-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Authorized Clinical Substitution Sign-off</h3>
+                <button class="modal-close-btn" onclick="App.closeModal('substitution-modal')">&times;</button>
+            </div>
+            <form id="substitution-form">
+                <input type="hidden" name="primary_medicine_id" id="sub-prim-id">
+                <input type="hidden" name="alternative_medicine_id" id="sub-alt-id">
+                <div class="modal-body">
+                    <div class="card" style="background:#F0FDF4; border-color:#BBF7D0; margin-bottom:1.25rem; padding:0.85rem;">
+                        <div class="text-xs font-bold text-success uppercase">Proposed Substitution</div>
+                        <div class="text-sm font-semibold" id="sub-pair-text">—</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Associated Reservation Request Number</label>
+                        <select class="form-select" name="reservation_id" id="sub-res-select" required>
+                            <option value="">Select Pending Reservation Request...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label required">Attending Physician Clinical Justification</label>
+                        <textarea class="form-textarea" name="clinical_justification" placeholder="Specify clinical rationale: e.g. Primary supply depleted, renal clearance parameters verified, therapeutic bioequivalence acceptable..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="App.closeModal('substitution-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-sub">Authorize Substitution</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/navigation.js"></script>
+    <script>
+        let currentAltData = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Navigation.init('alternatives');
+            await loadMedicinesDropdown();
+
+            const p = new URLSearchParams(window.location.search);
+            const medId = p.get('medicine_id');
+            if (medId) {
+                document.getElementById('medicine-select').value = medId;
+                await lookupAlternatives();
+            }
+
+            document.getElementById('substitution-form').addEventListener('submit', handleSubstitutionSignoff);
+        });
+
+        async function loadMedicinesDropdown() {
+            try {
+                const res = await API.get('/medicines', { limit: 100 });
+                if (res && res.data && res.data.items) {
+                    const sel = document.getElementById('medicine-select');
+                    res.data.items.forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value = m.id;
+                        opt.textContent = `${m.brand_name} (${m.generic_name} — ${m.strength})`;
+                        sel.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function lookupAlternatives() {
+            const medId = document.getElementById('medicine-select').value;
+            if (!medId) {
+                App.toast('warning', 'Please select a medicine first.');
+                return;
+            }
+
+            const resultsContainer = document.getElementById('alternatives-results-container');
+            resultsContainer.innerHTML = `<div class="card" style="padding:2.5rem; text-align:center;"><p class="text-muted">Querying verified clinical equivalents...</p></div>`;
+
+            try {
+                const res = await API.get(`/alternatives/${medId}`);
+                if (!res || !res.data) return;
+                currentAltData = res.data;
+                const { primary_medicine, alternatives } = currentAltData;
+
+                // Render Primary Card
+                const primCard = document.getElementById('primary-medicine-card');
+                primCard.style.display = 'block';
+                document.getElementById('prim-brand-name').textContent = primary_medicine.brand_name;
+                document.getElementById('prim-generic-name').textContent = `${primary_medicine.generic_name} (SKU: ${primary_medicine.sku})`;
+                document.getElementById('prim-available').textContent = `${primary_medicine.available_to_reserve} ${primary_medicine.unit_of_measure}`;
+                document.getElementById('prim-on-hand').textContent = `Physical on-hand: ${primary_medicine.physical_on_hand} ${primary_medicine.unit_of_measure}`;
+                document.getElementById('prim-strength').textContent = primary_medicine.strength;
+                document.getElementById('prim-form').textContent = primary_medicine.dosage_form;
+                document.getElementById('prim-category').textContent = primary_medicine.category_name;
+                document.getElementById('prim-reorder').textContent = `${primary_medicine.reorder_level} ${primary_medicine.unit_of_measure}`;
+
+                // Color primary availability
+                const avail = parseInt(primary_medicine.available_to_reserve);
+                document.getElementById('prim-available').style.color = avail <= 0 ? 'var(--critical)' : (avail <= primary_medicine.reorder_level ? 'var(--warning)' : 'var(--primary)');
+
+                // Render Alternatives List
+                if (!alternatives || alternatives.length === 0) {
+                    resultsContainer.innerHTML = `
+                        <div class="card">
+                            <div class="empty-state">
+                                <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                                <div class="empty-state-title">No Clinically Configured Alternatives Found</div>
+                                <div class="empty-state-text">No therapeutic alternative has been reviewed and verified for ${App.escapeHtml(primary_medicine.brand_name)}. The system will never guess a clinical recommendation based on name similarity alone. Consult hospital pharmacy management.</div>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+
+                resultsContainer.innerHTML = alternatives.map(alt => {
+                    const altAvail = parseInt(alt.available_to_reserve);
+                    const hasStock = altAvail > 0;
+
+                    let batchesHtml = '';
+                    if (alt.batches && alt.batches.length > 0) {
+                        batchesHtml = `
+                            <div style="margin-top:1rem; border-top:1px solid var(--border-color); padding-top:0.75rem;">
+                                <div class="text-xs font-bold text-muted uppercase" style="margin-bottom:0.5rem;">Eligible Batches (FEFO Dispensing Sequence)</div>
+                                <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+                                    ${alt.batches.map(b => `
+                                        <div style="background:var(--bg-surface-secondary); border:1px solid var(--border-color); border-radius:var(--radius-sm); padding:0.35rem 0.65rem; font-size:0.75rem;">
+                                            <span class="font-mono font-bold">${App.escapeHtml(b.batch_number)}</span>: <strong>${b.available_units} units</strong> in ${App.escapeHtml(b.location_name)} (Exp: ${App.formatDate(b.expiry_date)})
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    return `
+                        <div class="card" style="margin-bottom: 1.25rem;">
+                            <div class="card-header">
+                                <div>
+                                    <div style="display:flex; align-items:center; gap:0.5rem;">
+                                        <h3 class="card-title" style="font-size:1.15rem;">${App.escapeHtml(alt.brand_name)}</h3>
+                                        <span class="badge ${hasStock ? 'badge-safe' : 'badge-urgent'}">
+                                            ${hasStock ? 'Available Stock' : 'Out of Stock'}
+                                        </span>
+                                        ${alt.requires_clinical_approval ? `<span class="badge badge-warning">Requires Physician Sign-Off</span>` : ''}
+                                    </div>
+                                    <div class="text-muted text-xs" style="margin-top:0.2rem;">${App.escapeHtml(alt.generic_name)} (SKU: ${alt.sku})</div>
+                                </div>
+                                <div style="text-align:right;">
+                                    <div class="text-xs text-muted uppercase font-bold">Alternative Availability</div>
+                                    <div class="text-xl font-bold" style="color:${hasStock ? 'var(--success)' : 'var(--critical)'};">
+                                        ${altAvail} ${App.escapeHtml(alt.unit_of_measure)}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="font-size:0.875rem; color:var(--text-secondary); margin-bottom:0.75rem;">
+                                <strong style="color:var(--text-primary);">Pharmacology Equivalence Notes:</strong> ${App.escapeHtml(alt.therapeutic_equivalence_notes || 'Therapeutic equivalent antibiotic class.')}
+                            </div>
+
+                            <div style="display:flex; gap:1.5rem; flex-wrap:wrap; font-size:0.8125rem; color:var(--text-muted);">
+                                <div>Strength: <strong style="color:var(--text-primary);">${App.escapeHtml(alt.strength)}</strong></div>
+                                <div>Form: <strong style="color:var(--text-primary);">${App.escapeHtml(alt.dosage_form)}</strong></div>
+                                <div>Manufacturer: <strong style="color:var(--text-primary);">${App.escapeHtml(alt.manufacturer || 'Standard')}</strong></div>
+                            </div>
+
+                            ${batchesHtml}
+
+                            <div style="margin-top:1rem; display:flex; justify-content:flex-end; gap:0.5rem;">
+                                <button class="btn btn-primary btn-sm" onclick="openSubstitutionModal(${alt.alternative_id}, '${alt.brand_name}')">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg>
+                                    <span>Physician Substitution Sign-Off</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch (err) {
+                App.toast('error', 'Failed to retrieve clinical alternatives.');
+                console.error(err);
+            }
+        }
+
+        async function openSubstitutionModal(altId, altName) {
+            if (!currentAltData) return;
+            const prim = currentAltData.primary_medicine;
+
+            document.getElementById('sub-prim-id').value = prim.id;
+            document.getElementById('sub-alt-id').value = altId;
+            document.getElementById('sub-pair-text').textContent = `Substitute ${prim.brand_name} (${prim.strength}) with ${altName}`;
+
+            // Load pending reservations dropdown
+            try {
+                const res = await API.get('/reservations', { status: 'pending' });
+                const sel = document.getElementById('sub-res-select');
+                sel.innerHTML = '<option value="">Select Pending Reservation Request...</option>';
+                if (res && res.data) {
+                    res.data.forEach(r => {
+                        const opt = document.createElement('option');
+                        opt.value = r.id;
+                        opt.textContent = `${r.request_number} — ${r.department_name} (${r.requested_quantity} units of ${r.brand_name})`;
+                        sel.appendChild(opt);
+                    });
+                }
+            } catch (e) {
+                console.error(e);
+            }
+
+            App.openModal('substitution-modal');
+        }
+
+        async function handleSubstitutionSignoff(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('btn-submit-sub');
+
+            const payload = {
+                reservation_id: parseInt(form.reservation_id.value),
+                primary_medicine_id: parseInt(form.primary_medicine_id.value),
+                alternative_medicine_id: parseInt(form.alternative_medicine_id.value),
+                clinical_justification: form.clinical_justification.value.trim(),
+                status: 'approved'
+            };
+
+            btn.disabled = true;
+            btn.textContent = 'Recording Sign-Off...';
+
+            try {
+                await API.post('/alternative-approvals', payload);
+                App.toast('success', 'Physician clinical substitution authorized successfully');
+                App.closeModal('substitution-modal');
+            } catch (err) {
+                App.toast('error', err.message || 'Substitution sign-off failed');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Authorize Substitution';
+            }
+        }
+    </script>
+</body>
+</html>

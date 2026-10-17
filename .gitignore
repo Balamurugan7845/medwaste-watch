@@ -1,0 +1,15 @@
+# Environment & Secrets
+backend/.env
+.env
+
+# Storage & Temporary Files
+backend/storage/logs/*.log
+backend/storage/exports/*.csv
+backend/storage/private/*
+
+# OS & Editor Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp

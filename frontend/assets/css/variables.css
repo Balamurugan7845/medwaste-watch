@@ -1,0 +1,157 @@
+/* MedWaste Watch — Design Tokens & CSS Variables */
+:root {
+    /* Brand Palette */
+    --primary: #0F766E;
+    --primary-hover: #115E59;
+    --primary-light: #CCFBF1;
+    --primary-gradient: linear-gradient(135deg, #0F766E 0%, #06B6D4 100%);
+    --accent-cyan: #06B6D4;
+    --accent-cyan-light: #CFFAFE;
+
+    /* Neutrals & Surfaces (Light Theme: Clean Clinical White Sidebar) */
+    --sidebar-bg: #FFFFFF;
+    --sidebar-hover: #F1F5F9;
+    --sidebar-active: #E6FFFA;
+    --sidebar-text: #475569;
+    --sidebar-text-active: #0F766E;
+    --sidebar-border: #E2E8F0;
+
+    --bg-main: #F8FAFC;
+    --bg-surface: #FFFFFF;
+    --bg-surface-secondary: #F1F5F9;
+    --bg-surface-hover: #F8FAFC;
+
+    /* Text Colors */
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-muted: #64748B;
+    --text-light: #94A3B8;
+    --text-inverse: #FFFFFF;
+
+    /* Clinical Status Colors */
+    --critical: #DC2626;
+    --critical-bg: #FEF2F2;
+    --critical-border: #FECACA;
+    --critical-text: #991B1B;
+
+    --warning: #D97706;
+    --warning-bg: #FFFBEB;
+    --warning-border: #FDE68A;
+    --warning-text: #92400E;
+
+    --success: #16A34A;
+    --success-bg: #F0FDF4;
+    --success-border: #BBF7D0;
+    --success-text: #166534;
+
+    --info: #0284C7;
+    --info-bg: #F0F9FF;
+    --info-border: #BAE6FD;
+    --info-text: #0369A1;
+
+    --neutral-badge: #E2E8F0;
+    --neutral-text: #334155;
+
+    /* Borders & Shadows */
+    --border-color: #E2E8F0;
+    --border-color-focus: #0F766E;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-full: 9999px;
+
+    --shadow-sm: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.08), 0 2px 4px -2px rgba(15, 23, 42, 0.05);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+    --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+
+    /* Form & Input Variables */
+    --input-bg: #FFFFFF;
+    --input-border: #E2E8F0;
+    --input-text: #0F172A;
+    --table-header-bg: #F8FAFC;
+    --table-row-hover: #F8FAFC;
+    --empty-state-bg: #F8FAFC;
+
+    /* Layout Dimensions */
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 72px;
+    --topbar-height: 64px;
+
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-theme: background-color 200ms ease, border-color 200ms ease, color 200ms ease, box-shadow 200ms ease;
+}
+
+/* Dark Theme Tokens (Clinical OLED & Slate Night Mode) */
+[data-theme="dark"] {
+    /* Brand Palette */
+    --primary: #14B8A6;
+    --primary-hover: #2DD4BF;
+    --primary-light: rgba(20, 184, 166, 0.16);
+    --primary-gradient: linear-gradient(135deg, #0F766E 0%, #14B8A6 100%);
+    --accent-cyan: #22D3EE;
+    --accent-cyan-light: rgba(34, 211, 238, 0.16);
+
+    /* Neutrals & Surfaces */
+    --sidebar-bg: #090D16;
+    --sidebar-hover: #151D2C;
+    --sidebar-active: #0D3E3A;
+    --sidebar-text: #94A3B8;
+    --sidebar-text-active: #2DD4BF;
+    --sidebar-border: #1E293B;
+
+    --bg-main: #0B0F19;
+    --bg-surface: #111827;
+    --bg-surface-secondary: #1F2937;
+    --bg-surface-hover: #1E293B;
+
+    /* Text Colors */
+    --text-primary: #F9FAFB;
+    --text-secondary: #D1D5DB;
+    --text-muted: #9CA3AF;
+    --text-light: #6B7280;
+    --text-inverse: #0B0F19;
+
+    /* Clinical Status Colors */
+    --critical: #F87171;
+    --critical-bg: rgba(239, 68, 68, 0.16);
+    --critical-border: rgba(239, 68, 68, 0.35);
+    --critical-text: #FCA5A5;
+
+    --warning: #FBBF24;
+    --warning-bg: rgba(245, 158, 11, 0.16);
+    --warning-border: rgba(245, 158, 11, 0.35);
+    --warning-text: #FDE68A;
+
+    --success: #34D399;
+    --success-bg: rgba(16, 185, 129, 0.16);
+    --success-border: rgba(16, 185, 129, 0.35);
+    --success-text: #A7F3D0;
+
+    --info: #38BDF8;
+    --info-bg: rgba(14, 165, 233, 0.16);
+    --info-border: rgba(14, 165, 233, 0.35);
+    --info-text: #BAE6FD;
+
+    --neutral-badge: #1F2937;
+    --neutral-text: #E5E7EB;
+
+    /* Borders & Shadows */
+    --border-color: #1F2937;
+    --border-color-focus: #14B8A6;
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+
+    /* Form & Input Variables */
+    --input-bg: #161F30;
+    --input-border: #2D3748;
+    --input-text: #F9FAFB;
+    --table-header-bg: #151D2C;
+    --table-row-hover: #172033;
+    --empty-state-bg: #151D2C;
+}

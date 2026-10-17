@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storage Location Transfers — MedWaste Watch</title>
+    <link rel="stylesheet" href="/assets/css/variables.css">
+    <link rel="stylesheet" href="/assets/css/reset.css">
+    <link rel="stylesheet" href="/assets/css/typography.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/forms.css">
+    <link rel="stylesheet" href="/assets/css/tables.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <script src="/assets/js/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="app-main">
+            <div id="topbar-container"></div>
+
+            <main class="content-container">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>
+                            <span>Storage Location & Ward Transfers</span>
+                        </h1>
+                        <p>Controlled internal inventory movements between Main Vault, ER Pyxis cabinets, ICU carts, and Cold Chain storage.</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="openNewTransferModal()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            <span>New Location Transfer</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Transfers Data Table -->
+                <div class="data-table-container">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Transfer #</th>
+                                    <th>Medicine & Batch</th>
+                                    <th>Source Location</th>
+                                    <th>Destination Location</th>
+                                    <th>Quantity</th>
+                                    <th>Status</th>
+                                    <th>Initiated By</th>
+                                    <th>Timestamp</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transfers-tbody">
+                                <tr><td colspan="9" class="text-center text-muted" style="padding:2.5rem;">Loading internal transfers...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal: New Transfer -->
+    <div class="modal-backdrop" id="new-transfer-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Initiate Storage Location Transfer</h3>
+                <button class="modal-close-btn" onclick="App.closeModal('new-transfer-modal')">&times;</button>
+            </div>
+            <form id="new-transfer-form">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label required">Select Batch Lot to Move</label>
+                        <select class="form-select" name="batch_id" id="modal-batch-select" required>
+                            <option value="">Select Batch...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Destination Storage Location</label>
+                            <select class="form-select" name="destination_location_id" id="modal-dest-loc" required>
+                                <option value="">Select Destination Location...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Transfer Units</label>
+                            <input class="form-input" type="number" name="quantity" min="1" placeholder="e.g. 10" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Transfer Purpose / Notes</label>
+                        <textarea class="form-textarea" name="notes" placeholder="e.g. Replenishing ER Trauma satellite night stock..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="App.closeModal('new-transfer-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-transfer">Execute Transfer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/navigation.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Navigation.init('transfers');
+            await loadTransfers();
+            await loadDropdowns();
+
+            document.getElementById('new-transfer-form').addEventListener('submit', handleNewTransfer);
+        });
+
+        async function loadDropdowns() {
+            try {
+                // Batches
+                const batchRes = await API.get('/batches');
+                if (batchRes && batchRes.data) {
+                    const sel = document.getElementById('modal-batch-select');
+                    batchRes.data.forEach(b => {
+                        const avail = parseInt(b.available_units);
+                        if (avail > 0) {
+                            const opt = document.createElement('option');
+                            opt.value = b.id;
+                            opt.textContent = `${b.batch_number} — ${b.brand_name} (Avail: ${avail} in ${b.location_name})`;
+                            sel.appendChild(opt);
+                        }
+                    });
+                }
+
+                // Locations
+                const locRes = await API.get('/locations');
+                if (locRes && locRes.data) {
+                    const sel = document.getElementById('modal-dest-loc');
+                    locRes.data.forEach(l => {
+                        const opt = document.createElement('option');
+                        opt.value = l.id;
+                        opt.textContent = `${l.name} (${l.temp_zone})`;
+                        sel.appendChild(opt);
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadTransfers() {
+            const tbody = document.getElementById('transfers-tbody');
+            try {
+                const res = await API.get('/transfers');
+                if (!res || !res.data) return;
+
+                if (res.data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="9" class="text-center text-muted" style="padding:2.5rem;">No storage location transfers recorded yet.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = res.data.map(t => `
+                    <tr>
+                        <td class="font-mono font-bold">${App.escapeHtml(t.transfer_number)}</td>
+                        <td>
+                            <strong>${App.escapeHtml(t.brand_name || 'Consignment')}</strong>
+                            <div class="font-mono text-xs text-muted">${App.escapeHtml(t.batch_number || 'Batch')}</div>
+                        </td>
+                        <td>${App.escapeHtml(t.source_location_name)}</td>
+                        <td><strong style="color:var(--primary);">${App.escapeHtml(t.destination_location_name)}</strong></td>
+                        <td><strong>${t.quantity || '—'}</strong> units</td>
+                        <td><span class="badge badge-safe"><span class="badge-dot"></span>Completed</span></td>
+                        <td class="text-muted text-xs">${App.escapeHtml(t.initiated_by_name)}</td>
+                        <td class="text-muted text-xs">${App.formatDateTime(t.created_at)}</td>
+                        <td class="text-secondary text-xs">${App.escapeHtml(t.notes || '—')}</td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                App.toast('error', 'Failed to load transfer logs');
+                console.error(err);
+            }
+        }
+
+        function openNewTransferModal() {
+            document.getElementById('new-transfer-form').reset();
+            App.openModal('new-transfer-modal');
+        }
+
+        async function handleNewTransfer(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('btn-submit-transfer');
+
+            const payload = {
+                batch_id: parseInt(form.batch_id.value),
+                destination_location_id: parseInt(form.destination_location_id.value),
+                quantity: parseInt(form.quantity.value),
+                notes: form.notes.value.trim()
+            };
+
+            btn.disabled = true;
+            btn.textContent = 'Transferring...';
+
+            try {
+                await API.post('/transfers', payload);
+                App.toast('success', 'Internal storage transfer logged and completed');
+                App.closeModal('new-transfer-modal');
+                await loadTransfers();
+            } catch (err) {
+                App.toast('error', err.message || 'Transfer failed');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Execute Transfer';
+            }
+        }
+    </script>
+</body>
+</html>

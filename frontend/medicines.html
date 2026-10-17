@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicines Inventory Catalog — MedWaste Watch</title>
+    <link rel="stylesheet" href="/assets/css/variables.css">
+    <link rel="stylesheet" href="/assets/css/reset.css">
+    <link rel="stylesheet" href="/assets/css/typography.css">
+    <link rel="stylesheet" href="/assets/css/layout.css">
+    <link rel="stylesheet" href="/assets/css/components.css">
+    <link rel="stylesheet" href="/assets/css/forms.css">
+    <link rel="stylesheet" href="/assets/css/tables.css">
+    <link rel="stylesheet" href="/assets/css/responsive.css">
+    <script src="/assets/js/theme.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <div id="sidebar-container"></div>
+        <div class="app-main">
+            <div id="topbar-container"></div>
+
+            <main class="content-container">
+                <div class="page-header">
+                    <div class="page-title-group">
+                        <h1>
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--primary);"><path d="m19 14 1.5-1.5a2.828 2.828 0 1 0-4-4L15 10"/><path d="m14 15 1.5-1.5a2.828 2.828 0 1 0-4-4L10 11"/><path d="m10 19 1.5-1.5a2.828 2.828 0 1 0-4-4L6 15"/></svg>
+                            <span>Medicines Master Catalog</span>
+                        </h1>
+                        <p>Hospital formulary, active therapeutic listings, and batch aggregation stock levels.</p>
+                    </div>
+                    <div class="page-actions" id="admin-actions">
+                        <button class="btn btn-primary" onclick="openAddMedicineModal()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                            <span>Add New Medicine</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters & Search Bar -->
+                <div class="filter-bar">
+                    <div class="search-input-wrapper">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                        <input type="text" id="search-input" class="search-input" placeholder="Search by brand name, generic name, or SKU...">
+                    </div>
+                    <div class="filter-controls">
+                        <select id="category-filter" class="form-select" style="min-width: 180px;">
+                            <option value="0">All Categories</option>
+                        </select>
+                        <select id="status-filter" class="form-select" style="min-width: 140px;">
+                            <option value="all">All Status</option>
+                            <option value="active">Active Only</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                        <button class="btn btn-secondary btn-sm" onclick="resetFilters()">Reset</button>
+                    </div>
+                </div>
+
+                <!-- Data Table -->
+                <div class="data-table-container">
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Medicine Name & Generic</th>
+                                    <th>Category</th>
+                                    <th>Strength & Form</th>
+                                    <th>On-Hand</th>
+                                    <th>Reserved</th>
+                                    <th>Available</th>
+                                    <th>Reorder</th>
+                                    <th>Status</th>
+                                    <th class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="medicines-tbody">
+                                <tr><td colspan="10" class="text-center text-muted" style="padding:2rem;">Loading medicines catalog...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination-wrapper" id="pagination-wrapper">
+                        <div id="pagination-info">Showing 0 of 0 medicines</div>
+                        <div class="pagination-pages" id="pagination-pages"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal: Add New Medicine -->
+    <div class="modal-backdrop" id="add-medicine-modal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <h3 class="modal-title">Register Medicine into Hospital Catalog</h3>
+                <button class="modal-close-btn" onclick="App.closeModal('add-medicine-modal')">&times;</button>
+            </div>
+            <form id="add-medicine-form">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">SKU / Item Code</label>
+                            <input class="form-input font-mono" type="text" name="sku" placeholder="e.g. MED-ABX-005" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Therapeutic Category</label>
+                            <select class="form-select" name="category_id" id="modal-category-select" required>
+                                <option value="">Select Category...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Brand / Trade Name</label>
+                            <input class="form-input" type="text" name="brand_name" placeholder="e.g. Augmentin" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Generic Name (API)</label>
+                            <input class="form-input" type="text" name="generic_name" placeholder="e.g. Amoxicillin / Clavulanate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Strength</label>
+                            <input class="form-input" type="text" name="strength" placeholder="e.g. 625mg or 1g/vial" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Dosage Form</label>
+                            <select class="form-select" name="dosage_form" required>
+                                <option value="tablet">Tablet</option>
+                                <option value="capsule">Capsule</option>
+                                <option value="injection">Injection</option>
+                                <option value="syrup">Syrup</option>
+                                <option value="suspension">Suspension</option>
+                                <option value="ointment">Ointment</option>
+                                <option value="inhaler">Inhaler</option>
+                                <option value="drops">Drops</option>
+                                <option value="iv_fluid">IV Fluid</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label required">Unit of Measure (UOM)</label>
+                            <select class="form-select" name="unit_of_measure" required>
+                                <option value="box">Box</option>
+                                <option value="vial">Vial</option>
+                                <option value="ampoule">Ampoule</option>
+                                <option value="strip">Strip</option>
+                                <option value="bottle">Bottle</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label required">Reorder Level Threshold</label>
+                            <input class="form-input" type="number" name="reorder_level" value="25" min="1" required>
+                            <div class="form-hint">Triggers low-stock replenishment alert</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Manufacturer / Lab</label>
+                        <input class="form-input" type="text" name="manufacturer" placeholder="e.g. GlaxoSmithKline">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Clinical Description / Indications</label>
+                        <textarea class="form-textarea" name="description" placeholder="Clinical notes, storage guidelines..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="App.closeModal('add-medicine-modal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="save-med-btn">Save to Formulary</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/app.js"></script>
+    <script src="/assets/js/navigation.js"></script>
+    <script>
+        let currentPage = 1;
+        let categoriesList = [];
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await Navigation.init('medicines');
+            await loadCategories();
+            await loadMedicines();
+
+            // Setup Search Debounce
+            document.getElementById('search-input').addEventListener('input', App.debounce(() => {
+                currentPage = 1;
+                loadMedicines();
+            }, 300));
+
+            document.getElementById('category-filter').addEventListener('change', () => {
+                currentPage = 1;
+                loadMedicines();
+            });
+
+            document.getElementById('status-filter').addEventListener('change', () => {
+                currentPage = 1;
+                loadMedicines();
+            });
+
+            document.getElementById('add-medicine-form').addEventListener('submit', handleAddMedicine);
+        });
+
+        async function loadCategories() {
+            try {
+                const res = await API.get('/medicines/categories');
+                if (res && res.data) {
+                    categoriesList = res.data;
+                    const filterSelect = document.getElementById('category-filter');
+                    const modalSelect = document.getElementById('modal-category-select');
+
+                    categoriesList.forEach(c => {
+                        const opt = document.createElement('option');
+                        opt.value = c.id;
+                        opt.textContent = c.name;
+                        filterSelect.appendChild(opt);
+
+                        const mOpt = document.createElement('option');
+                        mOpt.value = c.id;
+                        mOpt.textContent = c.name;
+                        modalSelect.appendChild(mOpt);
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        async function loadMedicines() {
+            const tbody = document.getElementById('medicines-tbody');
+            const search = document.getElementById('search-input').value.trim();
+            const categoryId = document.getElementById('category-filter').value;
+            const status = document.getElementById('status-filter').value;
+
+            try {
+                const res = await API.get('/medicines', {
+                    search,
+                    category_id: categoryId,
+                    status,
+                    page: currentPage,
+                    limit: 15
+                });
+
+                if (!res || !res.data) return;
+                const { items, total, page, total_pages } = res.data;
+
+                if (items.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="10" class="text-center text-muted" style="padding:2.5rem;">No medicines matched your query.</td></tr>`;
+                    document.getElementById('pagination-info').textContent = 'Showing 0 medicines';
+                    document.getElementById('pagination-pages').innerHTML = '';
+                    return;
+                }
+
+                tbody.innerHTML = items.map(m => `
+                    <tr>
+                        <td class="font-mono text-sm">${App.escapeHtml(m.sku)}</td>
+                        <td>
+                            <a href="/medicine-details.html?id=${m.id}" style="color:var(--primary); font-weight:600;">
+                                ${App.escapeHtml(m.brand_name)}
+                            </a>
+                            <div class="text-muted text-xs">${App.escapeHtml(m.generic_name)}</div>
+                        </td>
+                        <td class="text-muted">${App.escapeHtml(m.category_name)}</td>
+                        <td>${App.escapeHtml(m.strength)} <span class="badge badge-neutral text-xs">${App.escapeHtml(m.dosage_form)}</span></td>
+                        <td><strong>${m.physical_on_hand}</strong></td>
+                        <td class="text-muted">${m.reserved_quantity}</td>
+                        <td><strong style="color: ${m.available_to_reserve <= 0 ? 'var(--critical)' : 'var(--text-primary)'};">${m.available_to_reserve}</strong></td>
+                        <td class="text-muted">${m.reorder_level}</td>
+                        <td>${App.renderStockBadge(m.stock_health)}</td>
+                        <td class="text-right" style="white-space:nowrap;">
+                            <a href="/medicine-details.html?id=${m.id}" class="btn btn-secondary btn-sm" title="View Batches & Analytics">${App.icon('eye')} <span>Details</span></a>
+                            <a href="/alternatives.html?medicine_id=${m.id}" class="btn btn-outline btn-sm" title="Lookup Clinical Alternatives">${App.icon('swap')} <span>Alts</span></a>
+                        </td>
+                    </tr>
+                `).join('');
+
+                // Update Pagination
+                document.getElementById('pagination-info').textContent = `Showing ${(page-1)*15 + 1}–${Math.min(page*15, total)} of ${total} medicines`;
+                renderPagination(page, total_pages);
+            } catch (err) {
+                App.toast('error', 'Failed to load medicines.');
+                console.error(err);
+            }
+        }
+
+        function renderPagination(page, totalPages) {
+            const pagesDiv = document.getElementById('pagination-pages');
+            if (totalPages <= 1) {
+                pagesDiv.innerHTML = '';
+                return;
+            }
+
+            let html = `
+                <button class="page-btn" ${page <= 1 ? 'disabled' : ''} onclick="goToPage(${page - 1})">&laquo;</button>
+            `;
+
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= page - 2 && i <= page + 2)) {
+                    html += `<button class="page-btn ${i === page ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+                } else if (i === page - 3 || i === page + 3) {
+                    html += `<span style="padding:0 0.25rem;">...</span>`;
+                }
+            }
+
+            html += `
+                <button class="page-btn" ${page >= totalPages ? 'disabled' : ''} onclick="goToPage(${page + 1})">&raquo;</button>
+            `;
+
+            pagesDiv.innerHTML = html;
+        }
+
+        function goToPage(p) {
+            currentPage = p;
+            loadMedicines();
+        }
+
+        function resetFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('category-filter').value = '0';
+            document.getElementById('status-filter').value = 'all';
+            currentPage = 1;
+            loadMedicines();
+        }
+
+        function openAddMedicineModal() {
+            document.getElementById('add-medicine-form').reset();
+            App.openModal('add-medicine-modal');
+        }
+
+        async function handleAddMedicine(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('save-med-btn');
+
+            const payload = {
+                sku: form.sku.value.trim(),
+                category_id: parseInt(form.category_id.value),
+                brand_name: form.brand_name.value.trim(),
+                generic_name: form.generic_name.value.trim(),
+                strength: form.strength.value.trim(),
+                dosage_form: form.dosage_form.value,
+                unit_of_measure: form.unit_of_measure.value,
+                reorder_level: parseInt(form.reorder_level.value),
+                manufacturer: form.manufacturer.value.trim(),
+                description: form.description.value.trim()
+            };
+
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            try {
+                await API.post('/medicines', payload);
+                App.toast('success', `Medicine ${payload.brand_name} registered successfully`);
+                App.closeModal('add-medicine-modal');
+                await loadMedicines();
+            } catch (err) {
+                App.toast('error', err.message || 'Failed to save medicine');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Save to Formulary';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedWaste Watch — Hospital Medicine Availability & Expiry Tracking</title>
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = await Auth.check();
+            if (user) {
+                window.location.replace('/dashboard.html');
+            } else {
+                window.location.replace('/login.html');
+            }
+        });
+    </script>
+</head>
+<body style="background-color: #0F172A; display: flex; align-items: center; justify-content: center; height: 100vh; color: #FFF; font-family: sans-serif;">
+    <div style="text-align: center;">
+        <h2 style="font-size: 1.5rem; margin-bottom: 0.5rem;">MedWaste Watch</h2>
+        <p style="color: #06B6D4; font-size: 0.9rem;">Initializing clinical environment...</p>
+    </div>
+</body>
+</html>

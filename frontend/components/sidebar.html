@@ -1,0 +1,102 @@
+<!-- MedWaste Watch — Sidebar Partial Template (frontend/components/sidebar.html) -->
+<aside class="app-sidebar" id="app-sidebar">
+    <div class="sidebar-header">
+        <div class="sidebar-logo-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
+        </div>
+        <div class="sidebar-logo-text">
+            <div class="sidebar-brand-name">MedWaste Watch</div>
+            <div class="sidebar-tagline">Clinical Inventory SaaS</div>
+        </div>
+        <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Close navigation sidebar" title="Close">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section-title">Overview</div>
+        <a href="/dashboard.html" class="nav-link" data-slug="dashboard">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+            <span>Dashboard</span>
+        </a>
+
+        <div class="nav-section-title">Inventory & Stock</div>
+        <a href="/medicines.html" class="nav-link" data-slug="medicines">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m19 14 1.5-1.5a2.828 2.828 0 1 0-4-4L15 10"/><path d="m14 15 1.5-1.5a2.828 2.828 0 1 0-4-4L10 11"/><path d="m10 19 1.5-1.5a2.828 2.828 0 1 0-4-4L6 15"/><path d="m5 19 1.5-1.5a2.828 2.828 0 1 0-4-4L1 15"/></svg>
+            <span>Medicines Catalog</span>
+        </a>
+        <a href="/batches.html" class="nav-link" data-slug="batches">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+            <span>Batch Management</span>
+        </a>
+        <a href="/expiry.html" class="nav-link" data-slug="expiry">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Expiry Priority</span>
+        </a>
+        <a href="/low-stock.html" class="nav-link" data-slug="low-stock">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="m17 5-5-3-5 3"/><path d="m17 19-5 3-5-3"/></svg>
+            <span>Low-Stock Alerts</span>
+        </a>
+
+        <div class="nav-section-title">Clinical Operations</div>
+        <a href="/reservations.html" class="nav-link" data-slug="reservations">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1Z"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>
+            <span>Stock Reservations</span>
+        </a>
+        <a href="/alternatives.html" class="nav-link" data-slug="alternatives">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="M15 15l6 6"/><path d="M4 4l5 5"/></svg>
+            <span>Alternative Lookup</span>
+        </a>
+        <a href="/transfers.html" class="nav-link" data-slug="transfers">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>
+            <span>Location Transfers</span>
+        </a>
+        <a href="/disposal.html" class="nav-link" data-slug="disposal">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+            <span>Waste & Disposal</span>
+        </a>
+
+        <div class="nav-section-title">Intelligence & Reports</div>
+        <a href="/reports.html" class="nav-link" data-slug="reports">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+            <span>Reports & CSV</span>
+        </a>
+        <a href="/notifications.html" class="nav-link" data-slug="notifications">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            <span>Alerts Center</span>
+            <span class="nav-badge badge-critical unread-notif-count" style="display:none;">0</span>
+        </a>
+
+        <div class="nav-section-title admin-only">Administration</div>
+        <a href="/users.html" class="nav-link admin-only" data-slug="users">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Staff & Users</span>
+        </a>
+        <a href="/departments.html" class="nav-link admin-only" data-slug="departments">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/><path d="M18 14h-8"/><path d="M15 18h-5"/><path d="M10 6h8v4h-8V6Z"/></svg>
+            <span>Departments</span>
+        </a>
+        <a href="/settings.html" class="nav-link admin-only" data-slug="settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+            <span>Hospital Settings</span>
+        </a>
+        <a href="/audit-logs.html" class="nav-link" data-slug="audit-logs">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            <span>Audit Trail</span>
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="user-profile-badge">
+            <div class="user-avatar" id="sidebar-user-avatar">U</div>
+            <div style="overflow:hidden;">
+                <div class="user-meta-name" id="sidebar-user-name">Staff Member</div>
+                <div class="user-meta-role" id="sidebar-user-role">Clinical Role</div>
+            </div>
+        </div>
+        <button class="topbar-btn" id="logout-sidebar-btn" title="Sign Out">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+        </button>
+    </div>
+</aside>
+<div class="sidebar-overlay" id="sidebar-overlay"></div>

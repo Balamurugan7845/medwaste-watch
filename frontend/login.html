@@ -1,216 +1,318 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Clinical Staff Portal — MedWaste Watch</title>
-    <link rel="stylesheet" href="/assets/css/variables.css">
-    <link rel="stylesheet" href="/assets/css/reset.css">
-    <link rel="stylesheet" href="/assets/css/typography.css">
-    <link rel="stylesheet" href="/assets/css/components.css">
-    <link rel="stylesheet" href="/assets/css/forms.css">
+    <link rel="stylesheet" href="/assets/css/variables.css" />
+    <link rel="stylesheet" href="/assets/css/reset.css" />
+    <link rel="stylesheet" href="/assets/css/typography.css" />
+    <link rel="stylesheet" href="/assets/css/components.css" />
+    <link rel="stylesheet" href="/assets/css/forms.css" />
     <script src="/assets/js/theme.js"></script>
     <style>
+      .login-page {
+        min-height: 100vh;
+        background: radial-gradient(
+          circle at top right,
+          #1e293b 0%,
+          #0f172a 100%
+        );
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .login-page::before {
+        content: "";
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(
+          circle,
+          rgba(15, 118, 110, 0.15) 0%,
+          transparent 70%
+        );
+        top: -150px;
+        right: -150px;
+        pointer-events: none;
+      }
+
+      .login-theme-toggle {
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+        border-radius: var(--radius-sm);
+        padding: 0.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition-fast);
+        z-index: 20;
+      }
+      .login-theme-toggle:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .login-card {
+        background-color: var(--bg-surface);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        width: 100%;
+        max-width: 480px;
+        padding: 2.5rem 2.25rem;
+        position: relative;
+        z-index: 10;
+      }
+
+      .login-brand-header {
+        text-align: center;
+        margin-bottom: 2rem;
+      }
+
+      .login-logo-box {
+        width: 52px;
+        height: 52px;
+        border-radius: var(--radius-md);
+        background: var(--primary-gradient);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        box-shadow: 0 8px 16px rgba(15, 118, 110, 0.35);
+        margin-bottom: 1rem;
+      }
+
+      .login-brand-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+      }
+
+      .login-brand-tagline {
+        font-size: 0.8125rem;
+        color: var(--primary);
+        font-weight: 600;
+        margin-top: 0.25rem;
+      }
+
+      .hospital-subtext {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-top: 0.35rem;
+      }
+
+      .demo-roles-container {
+        margin-top: 1.75rem;
+        padding-top: 1.5rem;
+        border-top: 1px dashed var(--border-color);
+      }
+
+      .demo-roles-title {
+        font-size: 0.725rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .demo-roles-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+      }
+
+      .demo-role-btn {
+        background-color: var(--bg-surface-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-sm);
+        padding: 0.5rem;
+        text-align: left;
+        transition: all var(--transition-fast);
+        cursor: pointer;
+      }
+
+      .demo-role-btn:hover {
+        border-color: var(--primary);
+        background-color: var(--primary-light);
+      }
+
+      .demo-role-name {
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .demo-role-sub {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+      }
+
+      @media (max-width: 480px) {
         .login-page {
-            min-height: 100vh;
-            background: radial-gradient(circle at top right, #1E293B 0%, #0F172A 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1.5rem;
-            position: relative;
-            overflow: hidden;
+          padding: 1rem;
         }
-
-        .login-page::before {
-            content: '';
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(15, 118, 110, 0.15) 0%, transparent 70%);
-            top: -150px;
-            right: -150px;
-            pointer-events: none;
-        }
-
-        .login-theme-toggle {
-            position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #FFFFFF;
-            border-radius: var(--radius-sm);
-            padding: 0.5rem;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all var(--transition-fast);
-            z-index: 20;
-        }
-        .login-theme-toggle:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
         .login-card {
-            background-color: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-lg);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 480px;
-            padding: 2.5rem 2.25rem;
-            position: relative;
-            z-index: 10;
+          padding: 1.75rem 1.25rem;
+          margin: 0;
         }
-
-        .login-brand-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .login-logo-box {
-            width: 52px;
-            height: 52px;
-            border-radius: var(--radius-md);
-            background: var(--primary-gradient);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: #FFFFFF;
-            box-shadow: 0 8px 16px rgba(15, 118, 110, 0.35);
-            margin-bottom: 1rem;
-        }
-
         .login-brand-title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            letter-spacing: -0.02em;
+          font-size: 1.35rem;
         }
-
-        .login-brand-tagline {
-            font-size: 0.8125rem;
-            color: var(--primary);
-            font-weight: 600;
-            margin-top: 0.25rem;
-        }
-
-        .hospital-subtext {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            margin-top: 0.35rem;
-        }
-
-        .demo-roles-container {
-            margin-top: 1.75rem;
-            padding-top: 1.5rem;
-            border-top: 1px dashed var(--border-color);
-        }
-
-        .demo-roles-title {
-            font-size: 0.725rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-muted);
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
         .demo-roles-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
+          grid-template-columns: 1fr;
         }
-
-        .demo-role-btn {
-            background-color: var(--bg-surface-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-sm);
-            padding: 0.5rem;
-            text-align: left;
-            transition: all var(--transition-fast);
-            cursor: pointer;
+        .login-theme-toggle {
+          top: 0.75rem;
+          right: 0.75rem;
         }
-
-        .demo-role-btn:hover {
-            border-color: var(--primary);
-            background-color: var(--primary-light);
-        }
-
-        .demo-role-name {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .demo-role-sub {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-        }
-
-        @media (max-width: 480px) {
-            .login-page {
-                padding: 1rem;
-            }
-            .login-card {
-                padding: 1.75rem 1.25rem;
-                margin: 0;
-            }
-            .login-brand-title {
-                font-size: 1.35rem;
-            }
-            .demo-roles-grid {
-                grid-template-columns: 1fr;
-            }
-            .login-theme-toggle {
-                top: 0.75rem;
-                right: 0.75rem;
-            }
-        }
+      }
     </style>
-</head>
-<body class="login-page">
-
-    <button class="login-theme-toggle" onclick="Theme.toggle()" title="Toggle Theme (Light / Dark)">
-        <svg class="theme-icon-light" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        <svg class="theme-icon-dark" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+  </head>
+  <body class="login-page">
+    <button
+      class="login-theme-toggle"
+      onclick="Theme.toggle()"
+      title="Toggle Theme (Light / Dark)"
+    >
+      <svg
+        class="theme-icon-light"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <circle cx="12" cy="12" r="5" />
+        <line x1="12" y1="1" x2="12" y2="3" />
+        <line x1="12" y1="21" x2="12" y2="23" />
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+        <line x1="1" y1="12" x2="3" y2="12" />
+        <line x1="21" y1="12" x2="23" y2="12" />
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+      </svg>
+      <svg
+        class="theme-icon-dark"
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        style="display: none"
+      >
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+      </svg>
     </button>
 
     <div class="login-card">
-        <div class="login-brand-header">
-            <div class="login-logo-box">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg>
-            </div>
-            <h1 class="login-brand-title">MedWaste Watch</h1>
-            <div class="login-brand-tagline">Smarter Medicine Management. Less Waste. Better Availability.</div>
-            <div class="hospital-subtext">St. Jude Metropolitan Hospital & Medical Center</div>
+      <div class="login-brand-header">
+        <div class="login-logo-box">
+          <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <path
+              d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"
+            />
+            <path d="m8.5 8.5 7 7" />
+          </svg>
+        </div>
+        <h1 class="login-brand-title">MedWaste Watch</h1>
+        <div class="login-brand-tagline">
+          Smarter Medicine Management. Less Waste. Better Availability.
+        </div>
+        <div class="hospital-subtext">
+          St. Jude Metropolitan Hospital & Medical Center
+        </div>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label required" for="email"
+            >Clinical Email ID</label
+          >
+          <input
+            class="form-input"
+            type="text"
+            id="email"
+            name="email"
+            placeholder="e.g. admin@stjude-hospital.org (or username)"
+            required
+            autofocus
+            autocomplete="email"
+          />
+          <span
+            class="form-hint"
+            style="
+              font-size: 0.75rem;
+              color: var(--text-muted);
+              margin-top: 0.35rem;
+              display: block;
+            "
+          >
+            Sign in with your registered hospital email address (e.g.
+            <code>admin@stjude-hospital.org</code>)
+          </span>
         </div>
 
-        <form id="login-form">
-            <div class="form-group">
-                <label class="form-label required" for="email">Clinical Email ID</label>
-                <input class="form-input" type="text" id="email" name="email" placeholder="e.g. admin@stjude-hospital.org (or username)" required autofocus autocomplete="email">
-                <span class="form-hint" style="font-size:0.75rem; color:var(--text-muted); margin-top:0.35rem; display:block;">
-                    Sign in with your registered hospital email address (e.g. <code>admin@stjude-hospital.org</code>)
-                </span>
-            </div>
+        <div class="form-group">
+          <label class="form-label required" for="password"
+            >Security Password</label
+          >
+          <input
+            class="form-input"
+            type="password"
+            id="password"
+            name="password"
+            placeholder="••••••••••••"
+            required
+            autocomplete="current-password"
+          />
+        </div>
 
-            <div class="form-group">
-                <label class="form-label required" for="password">Security Password</label>
-                <input class="form-input" type="password" id="password" name="password" placeholder="••••••••••••" required autocomplete="current-password">
-            </div>
-
-            <button type="submit" class="btn btn-primary" id="login-btn" style="width: 100%; padding: 0.75rem; margin-top: 0.5rem;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
-                <span>Authorize & Sign In with Email</span>
-            </button>
-        </form>
-<!-- 
+        <button
+          type="submit"
+          class="btn btn-primary"
+          id="login-btn"
+          style="width: 100%; padding: 0.75rem; margin-top: 0.5rem"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
+            <polyline points="10 17 15 12 10 7" />
+            <line x1="15" x2="3" y1="12" y2="12" />
+          </svg>
+          <span>Authorize & Sign In with Email</span>
+        </button>
+      </form>
+      <!-- 
         <div class="demo-roles-container">
             <div class="demo-roles-title">
                 <span>Quick Sign-In by Email</span>
@@ -246,35 +348,49 @@
     <script src="./assets/js/auth.js"></script>
     <script src="./assets/js/app.js"></script>
     <script>
-        function fillEmail(email) {
-            const input = document.getElementById('email');
-            if (input) input.value = email;
-            document.getElementById('password').value = 'Password@123';
-            App.toast('info', `Filled credentials for ${email}`);
-        }
+      function fillEmail(email) {
+        const input = document.getElementById("email");
+        if (input) input.value = email;
+        document.getElementById("password").value = "Password@123";
+        App.toast("info", `Filled credentials for ${email}`);
+      }
 
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('login-btn');
-            const emailIn = (document.getElementById('email') || document.getElementById('username')).value.trim();
-            const passIn = document.getElementById('password').value;
+      document
+        .getElementById("login-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const btn = document.getElementById("login-btn");
+          const emailIn = (
+            document.getElementById("email") ||
+            document.getElementById("username")
+          ).value.trim();
+          const passIn = document.getElementById("password").value;
 
-            btn.disabled = true;
-            btn.innerHTML = `<span>Verifying credentials...</span>`;
+          btn.disabled = true;
+          btn.innerHTML = `<span>Verifying credentials...</span>`;
 
-            try {
-                const res = await Auth.login(emailIn, passIn);
-                App.toast('success', `Welcome back, ${res.user.full_name}!`);
-                
-                const redirect = sessionStorage.getItem('medwaste_redirect') || '/dashboard.html';
-                sessionStorage.removeItem('medwaste_redirect');
-                setTimeout(() => window.location.href = redirect, 500);
-            } catch (err) {
-                App.toast('error', err.message || 'Login failed. Please check your credentials.');
-                btn.disabled = false;
-                btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg><span>Authorize & Sign In with Email</span>`;
-            }
+          try {
+            const res = await Auth.login(emailIn, passIn);
+            App.toast("success", `Welcome back, ${res.user.full_name}!`);
+
+            const savedRedirect = sessionStorage.getItem("medwaste_redirect");
+            sessionStorage.removeItem("medwaste_redirect");
+
+            const redirect =
+              savedRedirect && savedRedirect !== "/login.html"
+                ? savedRedirect
+                : "/dashboard.html";
+
+            setTimeout(() => window.location.replace(redirect), 500);
+          } catch (err) {
+            App.toast(
+              "error",
+              err.message || "Login failed. Please check your credentials.",
+            );
+            btn.disabled = false;
+            btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg><span>Authorize & Sign In with Email</span>`;
+          }
         });
     </script>
-</body>
+  </body>
 </html>

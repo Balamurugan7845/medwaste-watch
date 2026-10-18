@@ -766,12 +766,12 @@ try {
 
     echo "Seeding completed successfully!\n";
     echo "Default Demo Credentials:\n";
-    echo " - Super Admin: admin / Password@123\n";
-    echo " - Pharmacist:  pharmacist / Password@123\n";
-    echo " - ER Staff:    nurse_er / Password@123\n";
-    echo " - ICU Staff:   nurse_icu / Password@123\n";
-    echo " - Doctor:      doctor_icu / Password@123\n";
-    echo " - Auditor:     auditor / Password@123\n";
+    echo " - Super Admin: admin@stjude-hospital.org / Password@123\n";
+    echo " - Pharmacist:  er.charge.nurse@stjude-hospital.org / Password@123\n";
+    echo " - ER Staff:    er.charge.nurse@stjude-hospital.org / Password@123\n";
+    echo " - ICU Staff:   icu.nurse@stjude-hospital.org / Password@123\n";
+    echo " - Doctor:      dr.kavita@stjude-hospital.org / Password@123\n";
+    echo " - Auditor:     audit.compliance@stjude-hospital.org / Password@123\n";
 
 } catch (Throwable $e) {
     echo "Seeder Error: " . $e->getMessage() . "\n";

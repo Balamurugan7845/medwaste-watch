@@ -2,9 +2,9 @@
  * MedWaste Watch — Frontend Configuration
  */
 const AppConfig = {
-    API_BASE: ['localhost', '127.0.0.1'].includes(window.location.hostname)
-        ? '/api'
-        : 'https://medwaste-watch.onrender.com/api',
+    // The PHP router replaces this value from backend/.env (APP_URL) at runtime.
+    // Keep the same-origin fallback for static hosts and local development.
+    API_BASE: window.__MEDWASTE_ENV__?.API_BASE || '/api',
     APP_NAME: 'MedWaste Watch',
     HOSPITAL_NAME: 'St. Jude Metropolitan Hospital',
     DEFAULT_PAGE_SIZE: 15,

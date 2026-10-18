@@ -1,5 +1,6 @@
 # Environment & Secrets
 backend/.env
+frontend/.env
 .env
 
 # Storage & Temporary Files

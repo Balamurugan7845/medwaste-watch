@@ -24,6 +24,9 @@ class Response
             'trim',
             explode(',', (string) Config::get('CORS_ALLOWED_ORIGIN', ''))
         ));
+        // Keep the deployed frontend available if Render has not yet set the
+        // CORS_ALLOWED_ORIGIN environment variable. This is not a wildcard.
+        $allowedOrigins[] = 'https://medwaste-watch-frontend-git-main-balamurugan7845s-projects.vercel.app';
         if ($origin !== '' && in_array($origin, $allowedOrigins, true)) {
             header("Access-Control-Allow-Origin: {$origin}");
             header('Access-Control-Allow-Credentials: true');

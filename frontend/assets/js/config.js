@@ -4,7 +4,7 @@
 const AppConfig = {
     // The PHP router replaces this value from backend/.env (APP_URL) at runtime.
     // Keep the same-origin fallback for static hosts and local development.
-    API_BASE: window.__MEDWASTE_ENV__?.API_BASE || '/api',
+   API_BASE: window.__MEDWASTE_ENV__?.API_BASE || 'https://medwaste-watch.onrender.com/api',
     APP_NAME: 'MedWaste Watch',
     HOSPITAL_NAME: 'St. Jude Metropolitan Hospital',
     DEFAULT_PAGE_SIZE: 15,

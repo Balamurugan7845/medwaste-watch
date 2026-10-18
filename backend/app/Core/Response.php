@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Config\Config;
+
+require_once __DIR__ . '/../Config/Config.php';
+
 class Response
 {
     public static function json(array $data, int $statusCode = 200, array $headers = []): void
@@ -14,13 +18,18 @@ class Response
         header('X-Frame-Options: SAMEORIGIN');
         header('X-XSS-Protection: 1; mode=block');
 
-        // CORS headers if needed
+        // Reflect only explicitly configured origins when credentials are enabled.
         $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-        if ($origin !== '') {
+        $allowedOrigins = array_filter(array_map(
+            'trim',
+            explode(',', (string) Config::get('CORS_ALLOWED_ORIGIN', ''))
+        ));
+        if ($origin !== '' && in_array($origin, $allowedOrigins, true)) {
             header("Access-Control-Allow-Origin: {$origin}");
             header('Access-Control-Allow-Credentials: true');
             header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-CSRF-Token');
             header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
+            header('Vary: Origin');
         }
 
         foreach ($headers as $key => $val) {

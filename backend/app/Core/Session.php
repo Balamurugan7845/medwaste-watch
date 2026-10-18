@@ -23,6 +23,7 @@ class Session
             || (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
             || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443);
         $lifetime = max(300, Config::getInt('SESSION_LIFETIME', 7200));
+        $sameSite = $isSecure ? 'None' : 'Lax';
 
         session_set_cookie_params([
             'lifetime' => $lifetime,
@@ -30,7 +31,7 @@ class Session
             'domain'   => '',
             'secure'   => $isSecure,
             'httponly' => true,
-            'samesite' => 'Lax'
+            'samesite' => $sameSite
         ]);
 
         ini_set('session.use_strict_mode', '1');

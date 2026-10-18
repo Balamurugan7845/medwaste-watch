@@ -1,12 +1,38 @@
 # Environment & Secrets
+.env
+.env.*
+!.env.example
+!.env.production.example
+
 backend/.env
 frontend/.env
-.env
+
+# TLS Certificates & Private Keys
+backend/certs/*.pem
+backend/certs/*.key
+backend/certs/*.crt
+!backend/certs/README.md
 
 # Storage & Temporary Files
 backend/storage/logs/*.log
 backend/storage/exports/*.csv
 backend/storage/private/*
+backend/storage/tmp/*
+tmp/
+temp/
+
+# Dependencies
+node_modules/
+vendor/
+
+# Build & Framework Output
+dist/
+build/
+.next/
+.vercel/
+
+# Test & Coverage Output
+coverage/
 
 # OS & Editor Files
 .DS_Store
@@ -14,3 +40,10 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+php_errors.log
+.env.production

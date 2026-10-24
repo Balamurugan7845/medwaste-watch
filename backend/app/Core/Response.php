@@ -24,10 +24,16 @@ class Response
             'trim',
             explode(',', (string) Config::get('CORS_ALLOWED_ORIGIN', ''))
         ));
-        // Keep the deployed frontend available if Render has not yet set the
-        // CORS_ALLOWED_ORIGIN environment variable. This is not a wildcard.
+        // Keep both production and preview Vercel frontends allowed.
+        $allowedOrigins[] = 'https://medwaste-watch-frontend.vercel.app';
         $allowedOrigins[] = 'https://medwaste-watch-frontend-git-main-balamurugan7845s-projects.vercel.app';
-        if ($origin !== '' && in_array($origin, $allowedOrigins, true)) {
+
+        $isAllowed = in_array($origin, $allowedOrigins, true);
+        if (!$isAllowed && $origin !== '' && preg_match('#^https://medwaste-watch-frontend(-[a-z0-9-]+)?\.vercel\.app$#i', $origin)) {
+            $isAllowed = true;
+        }
+
+        if ($origin !== '' && $isAllowed) {
             header("Access-Control-Allow-Origin: {$origin}");
             header('Access-Control-Allow-Credentials: true');
             header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, X-CSRF-Token');

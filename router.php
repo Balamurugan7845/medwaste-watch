@@ -33,7 +33,7 @@ if ($uri === '/assets/js/config.js') {
 }
 
 // 1. API Route -> Backend Public Index
-if (str_starts_with($uri, '/api/')) {
+if ($uri === '/api' || str_starts_with($uri, '/api/')) {
     require_once __DIR__ . '/backend/public/index.php';
     return;
 }

@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/api",
+      "destination": "https://medwaste-watch.onrender.com/api"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://medwaste-watch.onrender.com/api/:path*"
+    }
+  ]
+}
